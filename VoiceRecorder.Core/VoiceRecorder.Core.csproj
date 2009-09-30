@@ -59,7 +59,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DragDropScrollViewer.cs" />
     <Compile Include="IViewManager.cs" />
     <Compile Include="IWaveFormRenderer.cs" />
     <Compile Include="PolygonWaveFormControl.xaml.cs">
