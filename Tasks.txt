@@ -1,0 +1,25 @@
+Initial View:
+* Allow selection of sample rate
+Recorder View:
+* Style the microphone level slider
+Save View:
+* Allow playback of selected portion
+* Bing for LAME
+* Better choice of default folder
+Whole App:
+* Include link to codeplex site
+* Nicer font for app title
+* Better colours for WaveForm display
+
+In a future version perhaps:
+* Save as WMA
+* Apply compressor effect
+* Rethink ViewManager - transitioning logic should be from outside
+* Add Unity and create services for SaveFileDialog, MessageBox, OpenFileDialog, Settings, StartProcess
+* WaveFile Renderer only creates drawing visuals it needs, uses its own SampleAggregator
+* Volume meter animations down & up
+* ClickOnce deploy
+* Allow tagging of the MP3
+* Try using MVVM Light
+
+* Range selector needs to scroll - adapt Dan Crevier's code

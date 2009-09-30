@@ -1,0 +1,11 @@
+﻿<UserControl x:Class="VoiceRecorder.Core.WaveFileTrimmerControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:my="clr-namespace:VoiceRecorder.Core">
+    <ScrollViewer CanContentScroll="True" HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Hidden">
+        <Grid>
+            <my:WaveFormVisual Height="100" VerticalAlignment="Center" HorizontalAlignment="Left" x:Name="waveFormRenderer"/>
+            <my:RangeSelectionControl HorizontalAlignment="Left" x:Name="rangeSelection" />
+        </Grid>
+    </ScrollViewer>            
+</UserControl>
