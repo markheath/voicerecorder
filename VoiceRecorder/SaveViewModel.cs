@@ -149,6 +149,14 @@ namespace VoiceRecorder
                             return ofd.FileName;
                         }
                     }
+                    else
+                    {
+                        return null;
+                    }
+                }
+                else
+                {
+                    return null;
                 }
             }
             return lameExePath;
