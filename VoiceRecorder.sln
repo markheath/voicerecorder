@@ -1,0 +1,37 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VoiceRecorder", "VoiceRecorder\VoiceRecorder.csproj", "{7EBEED32-BADD-4454-8309-AC8E6647EE51}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VoiceRecorder.Core", "VoiceRecorder.Core\VoiceRecorder.Core.csproj", "{9144E39B-F8E8-47D1-ADCC-086E2E806778}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{0B050756-B061-4C3F-B486-4FF69628D2EF}"
+	ProjectSection(SolutionItems) = preProject
+		Tasks.txt = Tasks.txt
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VoiceRecorder.Audio", "VoiceRecorder.Audio\VoiceRecorder.Audio.csproj", "{91EDFCAD-2495-44D2-BD45-7CC389C6D838}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{7EBEED32-BADD-4454-8309-AC8E6647EE51}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7EBEED32-BADD-4454-8309-AC8E6647EE51}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7EBEED32-BADD-4454-8309-AC8E6647EE51}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7EBEED32-BADD-4454-8309-AC8E6647EE51}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9144E39B-F8E8-47D1-ADCC-086E2E806778}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9144E39B-F8E8-47D1-ADCC-086E2E806778}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9144E39B-F8E8-47D1-ADCC-086E2E806778}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9144E39B-F8E8-47D1-ADCC-086E2E806778}.Release|Any CPU.Build.0 = Release|Any CPU
+		{91EDFCAD-2495-44D2-BD45-7CC389C6D838}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{91EDFCAD-2495-44D2-BD45-7CC389C6D838}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{91EDFCAD-2495-44D2-BD45-7CC389C6D838}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{91EDFCAD-2495-44D2-BD45-7CC389C6D838}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
