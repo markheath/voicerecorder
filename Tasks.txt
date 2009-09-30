@@ -22,4 +22,5 @@ In a future version perhaps:
 * Allow tagging of the MP3
 * Try using MVVM Light
 
-* Range selector needs to scroll - adapt Dan Crevier's code
+* Range selector needs to scroll - perhaps adapt Dan Crevier's code from 
+http://blogs.msdn.com/llobo/archive/2006/09/06/Scrolling-Scrollviewer-on-Mouse-Drag-at-the-boundaries.aspx
