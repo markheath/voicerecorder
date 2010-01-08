@@ -45,7 +45,8 @@ namespace VoiceRecorder.Audio
             set
             {
                 endPosition = value;
-                endBytePosition = (int)(WaveFormat.AverageBytesPerSecond * endPosition.TotalSeconds);
+                endPosition = value;
+                endBytePosition = (int)Math.Round(WaveFormat.AverageBytesPerSecond * endPosition.TotalSeconds);
                 endBytePosition = endBytePosition - (endBytePosition % WaveFormat.BlockAlign);
             }
         }
