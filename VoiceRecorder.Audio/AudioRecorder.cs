@@ -86,12 +86,13 @@ namespace VoiceRecorder.Audio
             int waveInDeviceNumber = waveIn.DeviceNumber;
             if (Environment.OSVersion.Version.Major >= 6) // Vista and over
             {
-                var mixerLine = new MixerLine((IntPtr)waveInDeviceNumber, 0, MixerFlags.WaveIn);
+                var mixerLine = waveIn.GetMixerLine();
+                //new MixerLine((IntPtr)waveInDeviceNumber, 0, MixerFlags.WaveIn);
                 foreach (var control in mixerLine.Controls)
                 {
                     if (control.ControlType == MixerControlType.Volume)
                     {
-                        volumeControl = control as UnsignedMixerControl;
+                        this.volumeControl = control as UnsignedMixerControl;
                         MicrophoneLevel = desiredVolume;
                         break;
                     }
