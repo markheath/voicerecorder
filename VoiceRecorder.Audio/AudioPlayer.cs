@@ -18,12 +18,6 @@ namespace VoiceRecorder.Audio
         public void LoadFile(string path)
         {
             inStream = new TrimWaveStream(new WaveFileReader(path));
-            inStream.ReachedEnd += new EventHandler(inStream_ReachedEnd);
-        }
-
-        void inStream_ReachedEnd(object sender, EventArgs e)
-        {
-            Stop();
         }
 
         public void Play()

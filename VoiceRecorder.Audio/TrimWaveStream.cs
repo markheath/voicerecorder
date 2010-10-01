@@ -13,7 +13,6 @@ namespace VoiceRecorder.Audio
         private long endBytePosition;
         private TimeSpan startPosition;
         private TimeSpan endPosition;
-        public event EventHandler ReachedEnd;
 
         public TrimWaveStream(WaveStream source)
         {
@@ -80,10 +79,6 @@ namespace VoiceRecorder.Audio
             if (bytesRequired > 0)
             {
                 bytesRead = source.Read(buffer, offset, bytesRequired);
-            }
-            else
-            {
-                //ReachedEnd(this, EventArgs.Empty);
             }
             return bytesRead;
         }
