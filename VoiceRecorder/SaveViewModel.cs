@@ -175,7 +175,7 @@ namespace VoiceRecorder
                 int bytesRead;
                 do
                 {
-                    bytesRead = reader.Read(waveBuffer);
+                    bytesRead = reader.Read(waveBuffer, 0, buffer.Length);
                     int samples = bytesRead / 2;
                     for (int sample = 0; sample < samples; sample++)
                     {
