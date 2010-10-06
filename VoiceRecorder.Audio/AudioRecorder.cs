@@ -23,7 +23,7 @@ namespace VoiceRecorder.Audio
         public AudioRecorder()
         {
             sampleAggregator = new SampleAggregator();
-            RecordingFormat = new WaveFormat(8000, 1);
+            RecordingFormat = new WaveFormat(44100, 1);
         }
 
         public WaveFormat RecordingFormat

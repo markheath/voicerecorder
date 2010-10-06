@@ -16,13 +16,10 @@ namespace VoiceRecorder.Core
         private List<float> maxValues;
         private List<float> minValues;
 
-
         public WaveFormVisual()
         {
-            maxValues = new List<float>();
-            minValues = new List<float>();
             visualCollection = new VisualCollection(this);
-            visualCollection.Add(CreateWaveFormVisual());
+            this.Reset();
             this.SizeChanged += new SizeChangedEventHandler(WaveFormVisual_SizeChanged);               
         }
 
@@ -129,5 +126,13 @@ namespace VoiceRecorder.Core
             return yTranslate + value * yScale;
         }
         #endregion
+
+        public void Reset()
+        {
+            maxValues = new List<float>();
+            minValues = new List<float>();
+            visualCollection.Clear();
+            visualCollection.Add(CreateWaveFormVisual());
+        }
     }
 }
