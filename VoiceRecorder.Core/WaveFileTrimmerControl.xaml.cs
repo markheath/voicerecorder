@@ -103,6 +103,12 @@ namespace VoiceRecorder.Core
         private void Subscribe()
         {
             SampleAggregator.MaximumCalculated += SampleAggregator_MaximumCalculated;
+            SampleAggregator.Restart += new EventHandler(SampleAggregator_Restart);
+        }
+
+        void SampleAggregator_Restart(object sender, EventArgs e)
+        {
+            this.waveFormRenderer.Reset();
         }
 
         void SampleAggregator_MaximumCalculated(object sender, MaxSampleEventArgs e)

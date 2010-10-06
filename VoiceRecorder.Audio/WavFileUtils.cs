@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using NAudio.Wave;
+using System.IO;
 
 namespace VoiceRecorder.Audio
 {
@@ -26,6 +27,11 @@ namespace VoiceRecorder.Audio
                     TrimWavFile(reader, writer, startPos, endPos);
                 }
             }
+        }
+
+        public static string GetTempWavFileName()
+        {
+            return Path.Combine(Path.GetTempPath(), new Guid().ToString() + ".wav");
         }
 
         private static void TrimWavFile(WaveFileReader reader, WaveFileWriter writer, int startPos, int endPos)

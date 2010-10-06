@@ -11,8 +11,13 @@
                 TotalWaveFormSamples="{Binding TotalWaveFormSamples}"
                 LeftSelection="{Binding LeftPosition, Mode=TwoWay}"
                 RightSelection="{Binding RightPosition, Mode=TwoWay}"/>
-        <Button Margin="5" Width="100" Command="{Binding PlayCommand}">Play</Button>
-        <Button Margin="5" Width="100" Command="{Binding SelectAllCommand}">Select All</Button>
-        <Button Margin="5" Width="100" Command="{Binding SaveCommand}">Save...</Button>
+        <StackPanel Orientation="Horizontal">
+            <Button Margin="5" Width="100" Command="{Binding PlayCommand}">Play</Button>
+            <Button Margin="5" Width="100" Command="{Binding SelectAllCommand}">Select All</Button>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal">
+            <Button Margin="5" Width="100" Command="{Binding SaveCommand}">Save...</Button>
+            <Button Margin="5" Width="100" Command="{Binding AutoTuneCommand}">Autotune</Button>
+        </StackPanel>
     </StackPanel>
 </UserControl>

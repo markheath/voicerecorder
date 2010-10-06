@@ -10,6 +10,7 @@ namespace VoiceRecorder.Audio
     {
         // volume
         public event EventHandler<MaxSampleEventArgs> MaximumCalculated;
+        public event EventHandler Restart = delegate { };
         public float maxValue;
         public float minValue;
         public int NotificationCount { get; set; }
@@ -17,6 +18,11 @@ namespace VoiceRecorder.Audio
 
         public SampleAggregator()
         {
+        }
+
+        public void RaiseRestart()
+        {
+            Restart(this, EventArgs.Empty);
         }
 
         private void Reset()

@@ -16,34 +16,54 @@ namespace VoiceRecorder
     class SaveViewModel : ViewModelBase
     {
         private string recordedFile;
+        private string originalFile;
         private SampleAggregator sampleAggregator;
-        private ICommand saveCommand;
-        private ICommand selectAllCommand;
-        private ICommand playCommand;
         private int leftPosition;
         private int rightPosition;
         private int totalWaveFormSamples;
         private IAudioPlayer audioPlayer;
         private int samplesPerSecond;
+        private bool isAutoTuneApplied;
 
         public SaveViewModel(IAudioPlayer audioPlayer)
         {
             this.SampleAggregator = new SampleAggregator();
-            SampleAggregator.NotificationCount = 800;
+            SampleAggregator.NotificationCount = 800; // gets set correctly later on
             this.audioPlayer = audioPlayer;
-            this.saveCommand = new RelayCommand(() => Save());
-            this.selectAllCommand = new RelayCommand(() => SelectAll());
-            this.playCommand = new RelayCommand(() => Play());
+            this.SaveCommand = new RelayCommand(() => Save());
+            this.SelectAllCommand = new RelayCommand(() => SelectAll());
+            this.PlayCommand = new RelayCommand(() => Play());
+            this.AutoTuneCommand = new RelayCommand(() => AutoTune(), ()=>CanAutoTune);
         }
 
-        public ICommand SaveCommand { get { return saveCommand; } }
-        public ICommand SelectAllCommand { get { return selectAllCommand; } }
-        public ICommand PlayCommand { get { return playCommand; } }
+        public bool CanAutoTune
+        {
+            get
+            {
+                return !isAutoTuneApplied;
+            }
+        }
+
+        private void AutoTune()
+        {
+            string tempPath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString() + ".wav");
+            // TODO: onto a background thread
+            SaveAs(tempPath, true);
+            isAutoTuneApplied = true;
+            CommandManager.InvalidateRequerySuggested();
+            this.originalFile = this.recordedFile;
+            OnViewActivated(tempPath);
+        }
+
+        public ICommand SaveCommand { get; private set; }
+        public ICommand SelectAllCommand { get; private set;  }
+        public ICommand PlayCommand { get; private set; }
+        public ICommand AutoTuneCommand { get; private set; }
 
         public override void OnViewActivated(object state)
         {
             this.recordedFile = (string)state;
-            RenderFile();
+            RenderFile();            
             base.OnViewActivated(state);
         }
 
@@ -51,6 +71,12 @@ namespace VoiceRecorder
         {
             audioPlayer.Dispose();            
             File.Delete(recordedFile);
+            this.recordedFile = null;
+            if (!String.IsNullOrEmpty(originalFile) && File.Exists(originalFile))
+            {
+                File.Decrypt(originalFile);
+                this.originalFile = null;
+            }
         }
 
         private void Save()
@@ -61,7 +87,7 @@ namespace VoiceRecorder
             bool? result = saveFileDialog.ShowDialog();
             if (result.HasValue && result.Value)
             {
-                SaveAs(saveFileDialog.FileName);
+                SaveAs(saveFileDialog.FileName, false);
             }
         }
 
@@ -71,22 +97,26 @@ namespace VoiceRecorder
             return TimeSpan.FromSeconds((double)samples / samplesPerSecond);
         }
 
-        private void SaveAs(string fileName)
+        private void SaveAs(string fileName, bool autoTune)
         {
             AudioSaver saver = new AudioSaver(recordedFile);
             saver.TrimFromStart = PositionToTimeSpan(LeftPosition);
             saver.TrimFromEnd = PositionToTimeSpan(TotalWaveFormSamples - RightPosition);
+            saver.ApplyAutoTune = autoTune;
 
             if (fileName.ToLower().EndsWith(".wav"))
             {
-                saver.SaveAsWav(fileName);
+                saver.SaveFileFormat = SaveFileFormat.Wav;
+                saver.SaveAudio(fileName);
             }
             else if (fileName.ToLower().EndsWith(".mp3"))
             {
                 string lameExePath = LocateLame();
                 if (lameExePath != null)
                 {
-                    saver.SaveAsMp3(lameExePath, fileName);
+                    saver.SaveFileFormat = SaveFileFormat.Mp3;
+                    saver.LameExePath = lameExePath;
+                    saver.SaveAudio(fileName);
                 }
             }
             else
@@ -164,6 +194,7 @@ namespace VoiceRecorder
 
         private void RenderFile()
         {
+            SampleAggregator.RaiseRestart();
             using (WaveFileReader reader = new WaveFileReader(recordedFile))
             {
                 this.samplesPerSecond = reader.WaveFormat.SampleRate;
