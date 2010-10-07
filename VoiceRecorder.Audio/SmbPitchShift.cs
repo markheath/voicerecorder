@@ -232,10 +232,11 @@ namespace VoiceRecorder.Audio
             float tr, ti, ur, ui;
             int p1r, p1i, p2r, p2i; // MRH: were float*
             int i, bitm, j, le, le2, k;
+            int fftFrameSize2 = fftFrameSize * 2;
 
-            for (i = 2; i < 2 * fftFrameSize - 2; i += 2)
+            for (i = 2; i < fftFrameSize2 - 2; i += 2)
             {
-                for (bitm = 2, j = 0; bitm < 2 * fftFrameSize; bitm <<= 1)
+                for (bitm = 2, j = 0; bitm < fftFrameSize2; bitm <<= 1)
                 {
                     if ((i & bitm) != 0) j++;
                     j <<= 1;
@@ -265,14 +266,20 @@ namespace VoiceRecorder.Audio
                 {
                     p1r = j; p1i = p1r + 1;
                     p2r = p1r + le2; p2i = p2r + 1;
-                    for (i = j; i < 2 * fftFrameSize; i += le)
+                    for (i = j; i < fftFrameSize2; i += le)
                     {
-                        tr = fftBuffer[p2r] * ur - fftBuffer[p2i] * ui;
-                        ti = fftBuffer[p2r] * ui + fftBuffer[p2i] * ur;
-                        fftBuffer[p2r] = fftBuffer[p1r] - tr; fftBuffer[p2i] = fftBuffer[p1i] - ti;
-                        fftBuffer[p1r] += tr; fftBuffer[p1i] += ti;
-                        p1r += le; p1i += le;
-                        p2r += le; p2i += le;
+                        float p2rVal = fftBuffer[p2r];
+                        float p2iVal = fftBuffer[p2i];
+                        tr = p2rVal * ur - p2iVal * ui;
+                        ti = p2rVal * ui + p2iVal * ur;
+                        fftBuffer[p2r] = fftBuffer[p1r] - tr; 
+                        fftBuffer[p2i] = fftBuffer[p1i] - ti;
+                        fftBuffer[p1r] += tr; 
+                        fftBuffer[p1i] += ti;
+                        p1r += le; 
+                        p1i += le;
+                        p2r += le; 
+                        p2i += le;
                     }
                     tr = ur * wr - ui * wi;
                     ui = ur * wi + ui * wr;

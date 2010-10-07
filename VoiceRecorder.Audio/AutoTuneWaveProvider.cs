@@ -5,7 +5,7 @@ using NAudio.Wave;
 
 namespace VoiceRecorder.Audio
 {
-    class AutoTuneWaveProvider : IWaveProvider
+    public class AutoTuneWaveProvider : IWaveProvider
     {
         private IWaveProvider source;
         private SmbPitchShifter pitchShifter;
