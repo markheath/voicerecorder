@@ -74,6 +74,7 @@
     <Compile Include="AudioRecorder.cs" />
     <Compile Include="AudioSaver.cs" />
     <Compile Include="AutoCorrelator.cs" />
+    <Compile Include="AutoTuneSettings.cs" />
     <Compile Include="AutoTuneUtils.cs" />
     <Compile Include="AutoTuneWaveProvider.cs" />
     <Compile Include="IAudioPlayer.cs" />

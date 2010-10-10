@@ -15,14 +15,12 @@ namespace VoiceRecorder
         private RelayCommand beginRecordingCommand;
         private RelayCommand stopCommand;
         private IAudioRecorder recorder;
-        private IViewManager viewManager;
         private float lastPeak;
         private string waveFileName;
 
-        public RecorderViewModel(IAudioRecorder recorder, IViewManager viewManager)
+        public RecorderViewModel(IAudioRecorder recorder)
         {
             this.recorder = recorder;
-            this.viewManager = viewManager;
             this.recorder.Stopped += new EventHandler(recorder_Stopped);
             this.beginRecordingCommand = new RelayCommand(() => BeginRecording(),
                 () => recorder.RecordingState == RecordingState.Stopped ||
@@ -34,7 +32,7 @@ namespace VoiceRecorder
 
         void recorder_Stopped(object sender, EventArgs e)
         {
-            viewManager.MoveTo("SaveView", waveFileName);
+            this.ViewManager.MoveTo("SaveView", waveFileName);
         }
 
         void recorder_MaximumCalculated(object sender, MaxSampleEventArgs e)

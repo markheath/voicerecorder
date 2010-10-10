@@ -10,6 +10,8 @@ namespace VoiceRecorder.Core
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
+        public IViewManager ViewManager { get; set; }
+
         protected void RaisePropertyChangedEvent(string propertyName)
         {
             if (PropertyChanged != null)

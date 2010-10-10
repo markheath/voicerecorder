@@ -7,7 +7,6 @@ using System.Text;
 
 namespace VoiceRecorder.Audio
 {
-
     class PitchShifter
     {
         int detectedNote;
@@ -33,9 +32,8 @@ namespace VoiceRecorder.Audio
             snapMode = snapmode;
             midiPluggedIn = pluggedIn;
             numshifts = 5000;
-            shifts = new Queue<PitchShift>();
-
-            //int minVal, int maxVal, int initialVal
+            shifts = new Queue<PitchShift>(numshifts);
+            
             vibRateSlider = new GuiSlider(0.2, 20.0, 4.0);
             vibDepthSlider = new GuiSlider(0.0, 0.05, 0);
             attackSlider = new GuiSlider(0.0, 200, 0.0);
@@ -77,22 +75,22 @@ namespace VoiceRecorder.Audio
 
         protected float snapFactor(float freq)
         {
-            float p = 0.0f;
-            float d = 0.0f;
-            int p_i = 0;
-            int d_i = 0;
+            float previousFrequency = 0.0f;
+            float correctedFrequency = 0.0f;
+            int previousNote = 0;
+            int correctedNote = 0;
             for (int i = 1; i < 120; i++)
             {
                 bool endLoop = false;
-                foreach (int k in autoPitches)
+                foreach (int note in autoPitches)
                 {
-                    if (i % 12 == k)
+                    if (i % 12 == note)
                     {
-                        p = d;
-                        p_i = d_i;
-                        d = (float)(8.175 * Math.Pow(1.05946309, (float)i));
-                        d_i = i;
-                        if (d > freq) { endLoop = true; }
+                        previousFrequency = correctedFrequency;
+                        previousNote = correctedNote;
+                        correctedFrequency = (float)(8.175 * Math.Pow(1.05946309, (float)i));
+                        correctedNote = i;
+                        if (correctedFrequency > freq) { endLoop = true; }
                         break;
                     }
                 }
@@ -101,31 +99,32 @@ namespace VoiceRecorder.Audio
                     break;
                 }
             }
-            if (d == 0.0) { return 1.0f; }
-            int num_i = 0;
-            double num = 0.0;
-            if (d - freq > freq - p)
+            if (correctedFrequency == 0.0) { return 1.0f; }
+            int destinationNote = 0;
+            double destinationFrequency = 0.0;
+            // decide whether we are shifting up or down
+            if (correctedFrequency - freq > freq - previousFrequency)
             {
-                num_i = p_i;
-                num = p;
+                destinationNote = previousNote;
+                destinationFrequency = previousFrequency;
             }
             else
             {
-                num_i = d_i;
-                num = d;
+                destinationNote = correctedNote;
+                destinationFrequency = correctedFrequency;
             }
-            if (num_i != currPitch)
+            if (destinationNote != currPitch)
             {
                 numElapsed = 0;
-                currPitch = num_i;
+                currPitch = destinationNote;
             }
             if (attack > numElapsed)
             {
-                double n = (num - freq) / attack * numElapsed;
-                num = freq + n;
+                double n = (destinationFrequency - freq) / attack * numElapsed;
+                destinationFrequency = freq + n;
             }
             numElapsed++;
-            return (float)(num / freq);
+            return (float)(destinationFrequency / freq);
         }
 
         protected void updateShifts()
@@ -162,11 +161,6 @@ namespace VoiceRecorder.Audio
             return (note % 12) == (detectedNote % 12) && detectedNote >= 0;
         }
 
-        bool isSnapMode()
-        {
-            return snapMode;
-        }
-
         bool isMidiPluggedIn()
         {
             return midiPluggedIn;
@@ -176,7 +170,6 @@ namespace VoiceRecorder.Audio
         {
             snapMode = !snapMode;
         }
-
 
         protected float addVibrato(int nFrames)
         {
