@@ -19,8 +19,9 @@ namespace VoiceRecorder
             viewModels = new Dictionary<string, ViewModelBase>();
             
             SetupView("WelcomeView", new WelcomeView(), new WelcomeViewModel(viewManager));
-            SetupView("RecorderView", new RecorderView(), new RecorderViewModel(new AudioRecorder(), viewManager));
+            SetupView("RecorderView", new RecorderView(), new RecorderViewModel(new AudioRecorder()));
             SetupView("SaveView", new SaveView(), new SaveViewModel(new AudioPlayer()));
+            SetupView("AutoTuneView", new AutoTuneView(), new AutoTuneViewModel());
 
             viewManager.ViewChanged += viewManager_ViewChanged;
         }
@@ -28,6 +29,7 @@ namespace VoiceRecorder
         private void SetupView(string viewName, FrameworkElement view, ViewModelBase viewModel)
         {
             view.DataContext = viewModel;
+            viewModel.ViewManager = viewManager;
             viewManager.AddView(viewName, view);
             viewModels.Add(viewName, viewModel);            
         }

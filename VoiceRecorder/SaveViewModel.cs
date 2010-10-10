@@ -46,6 +46,8 @@ namespace VoiceRecorder
 
         private void AutoTune()
         {
+            //this.ViewManager.MoveTo("AutoTuneView", this.originalFile);
+            
             string tempPath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString() + ".wav");
             // TODO: onto a background thread
             SaveAs(tempPath, true);

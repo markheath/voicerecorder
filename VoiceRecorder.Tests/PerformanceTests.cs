@@ -18,6 +18,14 @@ namespace VoiceRecorder.Tests
             Console.WriteLine("{0} ms", ms);
         }
 
+        [Test]
+        public void ShortTest()
+        {
+            Stopwatch timer = new Stopwatch();
+            long ms = timer.Time(() => ReadFromTestProvider(16 * 1024));
+            Console.WriteLine("{0} ms", ms);
+        }
+
         private static void ReadFromTestProvider(int bytesToRead)
         {
             TestWaveProvider source = new TestWaveProvider(44100, 1);
@@ -36,6 +44,11 @@ namespace VoiceRecorder.Tests
     // http://stackoverflow.com/questions/232848/wrapping-stopwatch-timing-with-a-delegate-or-lambda
     static class StopwatchExtensions
     {
+        public static long Time(this Stopwatch sw, Action action)
+        {
+            return sw.Time(action, 1);
+        }
+        
         public static long Time(this Stopwatch sw, Action action, int iterations)
         {
             sw.Reset();

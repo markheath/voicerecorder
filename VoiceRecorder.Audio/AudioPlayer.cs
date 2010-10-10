@@ -16,8 +16,10 @@ namespace VoiceRecorder.Audio
         }
 
         public void LoadFile(string path)
-        {
-            inStream = new TrimWaveStream(new WaveFileReader(path));
+        {            
+            CloseWaveOut();
+            CloseInStream();
+            this.inStream = new TrimWaveStream(new WaveFileReader(path));
         }
 
         public void Play()
@@ -68,15 +70,25 @@ namespace VoiceRecorder.Audio
 
         public void Dispose()
         {
-            if (waveOut != null)
-            {
-                waveOut.Dispose();
-                waveOut = null;
-            }
+            CloseWaveOut();
+            CloseInStream();
+        }
+
+        private void CloseInStream()
+        {
             if (inStream != null)
             {
                 inStream.Dispose();
                 inStream = null;
+            }
+        }
+
+        private void CloseWaveOut()
+        {
+            if (waveOut != null)
+            {
+                waveOut.Dispose();
+                waveOut = null;
             }
         }
     }

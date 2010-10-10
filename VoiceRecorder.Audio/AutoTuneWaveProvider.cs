@@ -11,9 +11,11 @@ namespace VoiceRecorder.Audio
         private SmbPitchShifter pitchShifter;
         private AutoCorrelator pitchDetector;
         private WaveBuffer waveBuffer;
+        private AutoTuneSettings autoTuneSettings;
 
         public AutoTuneWaveProvider(IWaveProvider source)
         {
+            this.autoTuneSettings = new AutoTuneSettings();
             if (source.WaveFormat.SampleRate != 44100)
                 throw new ArgumentException("AutoTune only works at 44.1kHz");
             if (source.WaveFormat.Encoding != WaveFormatEncoding.IeeeFloat)
@@ -25,6 +27,11 @@ namespace VoiceRecorder.Audio
             this.pitchDetector = new AutoCorrelator();
             this.pitchShifter = new SmbPitchShifter(true, true);
             this.waveBuffer = new WaveBuffer(8192);
+        }
+
+        public AutoTuneSettings Settings
+        {
+            get { return this.autoTuneSettings; }
         }
 
         public int Read(byte[] buffer, int offset, int count)
