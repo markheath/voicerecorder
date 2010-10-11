@@ -22,61 +22,47 @@ namespace VoiceRecorder
         public string DisplayName { get; set; }
     }
 
-
     class AutoTuneViewModel : ViewModelBase, IDisposable
     {
         public ICommand ApplyCommand { get; private set; }
         public ICommand CancelCommand { get; private set; }
-        public bool IsSnapMode { get; private set; }
-        private bool anyNote;
-
-        public bool IsSpecifiedNotes
+        private bool isSnapMode;
+        public bool IsSnapMode
         {
             get
             {
-                return !this.anyNote;
+                return isSnapMode;
             }
             set
             {
-                this.anyNote = !value;
-            }
-        }
-        public bool IsAnyNote
-        {
-            get
-            {
-                return this.anyNote;
-            }
-            set
-            {
-                if (this.anyNote != value)
+                if (isSnapMode != value)
                 {
-                    RaisePropertyChangedEvent("IsAnyNote");
-                    RaisePropertyChangedEvent("IsSpecifiedNotes");
+                    isSnapMode = value;
+                    RaisePropertyChangedEvent("IsSnapMode");
                 }
             }
         }
+        private SaveViewActivatedArgs activatedArgs;
 
-
-        public ObservableCollection<NoteViewModel> SelectedNotes { get; private set; }
+        public ObservableCollection<NoteViewModel> Pitches { get; private set; }
 
         public AutoTuneViewModel()
         {
             this.ApplyCommand = new RelayCommand(() => Apply());
             this.CancelCommand = new RelayCommand(() => Cancel());
-            this.SelectedNotes = new ObservableCollection<NoteViewModel>();
-            this.SelectedNotes.Add(new NoteViewModel(Notes.C,"C"));
-            this.SelectedNotes.Add(new NoteViewModel(Notes.CSharp,"C#"));
-            this.SelectedNotes.Add(new NoteViewModel(Notes.D,"D"));
-            this.SelectedNotes.Add(new NoteViewModel(Notes.DSharp,"D#"));
-            this.SelectedNotes.Add(new NoteViewModel(Notes.E,"E"));
-            this.SelectedNotes.Add(new NoteViewModel(Notes.F, "F"));
-            this.SelectedNotes.Add(new NoteViewModel(Notes.FSharp, "F#"));
-            this.SelectedNotes.Add(new NoteViewModel(Notes.G,"G"));
-            this.SelectedNotes.Add(new NoteViewModel(Notes.GSharp,"G#"));
-            this.SelectedNotes.Add(new NoteViewModel(Notes.A,"A"));
-            this.SelectedNotes.Add(new NoteViewModel(Notes.ASharp,"A#"));
-            this.SelectedNotes.Add(new NoteViewModel(Notes.B,"B"));
+            this.Pitches = new ObservableCollection<NoteViewModel>();
+            this.Pitches.Add(new NoteViewModel(Notes.C,"C"));
+            this.Pitches.Add(new NoteViewModel(Notes.CSharp,"C#"));
+            this.Pitches.Add(new NoteViewModel(Notes.D,"D"));
+            this.Pitches.Add(new NoteViewModel(Notes.DSharp,"D#"));
+            this.Pitches.Add(new NoteViewModel(Notes.E,"E"));
+            this.Pitches.Add(new NoteViewModel(Notes.F, "F"));
+            this.Pitches.Add(new NoteViewModel(Notes.FSharp, "F#"));
+            this.Pitches.Add(new NoteViewModel(Notes.G,"G"));
+            this.Pitches.Add(new NoteViewModel(Notes.GSharp,"G#"));
+            this.Pitches.Add(new NoteViewModel(Notes.A,"A"));
+            this.Pitches.Add(new NoteViewModel(Notes.ASharp,"A#"));
+            this.Pitches.Add(new NoteViewModel(Notes.B,"B"));
         }
 
         private void Apply()
@@ -84,9 +70,24 @@ namespace VoiceRecorder
 
         }
 
+        public override void OnViewActivated(object state)
+        {
+            this.activatedArgs = (SaveViewActivatedArgs)state;
+        }
+
+        public override void OnViewDeactivated(bool shuttingDown)
+        {
+            if (shuttingDown)
+            {
+                this.activatedArgs.DeleteFiles();
+            }
+            base.OnViewDeactivated(shuttingDown);
+        }
+
         private void Cancel()
         {
-            this.ViewManager.MoveTo("SaveView", null);
+            // TODO: delete autotune file if necessary
+            this.ViewManager.MoveTo("SaveView", new SaveViewActivatedArgs(this.activatedArgs.RecordingFileName, null));
         }
 
         public void Dispose()

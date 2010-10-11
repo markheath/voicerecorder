@@ -13,10 +13,45 @@ using VoiceRecorder.Properties;
 
 namespace VoiceRecorder
 {
+    class SaveViewActivatedArgs
+    {
+        public string RecordingFileName { get; private set; }
+        public string EffectedFileName { get; private set; }
+
+        public SaveViewActivatedArgs(string recordingFileName, string effectedFileName)
+        {
+            this.RecordingFileName = recordingFileName;
+            this.EffectedFileName = effectedFileName;
+        }
+
+        public string ActiveFile
+        {
+            get
+            {
+                if (String.IsNullOrEmpty(EffectedFileName))
+                    return RecordingFileName;
+                return EffectedFileName;
+            }
+        }
+
+        public void DeleteFiles()
+        {
+            this.RecordingFileName = null;
+            this.EffectedFileName = null;
+        }
+
+        private void DeleteFile(string fileName)
+        {
+            if (!String.IsNullOrEmpty(fileName) && File.Exists(fileName))
+            {
+                File.Delete(fileName);
+            }
+        }
+    }
+
     class SaveViewModel : ViewModelBase
     {
-        private string recordedFile;
-        private string originalFile;
+        private SaveViewActivatedArgs activatedArgs;
         private SampleAggregator sampleAggregator;
         private int leftPosition;
         private int rightPosition;
@@ -53,8 +88,7 @@ namespace VoiceRecorder
             SaveAs(tempPath, true);
             isAutoTuneApplied = true;
             CommandManager.InvalidateRequerySuggested();
-            this.originalFile = this.recordedFile;
-            OnViewActivated(tempPath);
+            OnViewActivated(new SaveViewActivatedArgs(this.activatedArgs.RecordingFileName, tempPath));
         }
 
         public ICommand SaveCommand { get; private set; }
@@ -64,20 +98,17 @@ namespace VoiceRecorder
 
         public override void OnViewActivated(object state)
         {
-            this.recordedFile = (string)state;
+            this.activatedArgs = (SaveViewActivatedArgs)state;
             RenderFile();            
             base.OnViewActivated(state);
         }
 
         public override void OnViewDeactivated(bool shuttingDown)
         {
-            audioPlayer.Dispose();            
-            File.Delete(recordedFile);
-            this.recordedFile = null;
-            if (!String.IsNullOrEmpty(originalFile) && File.Exists(originalFile))
+            audioPlayer.Dispose();
+            if (shuttingDown)
             {
-                File.Decrypt(originalFile);
-                this.originalFile = null;
+                activatedArgs.DeleteFiles();
             }
         }
 
@@ -101,7 +132,7 @@ namespace VoiceRecorder
 
         private void SaveAs(string fileName, bool autoTune)
         {
-            AudioSaver saver = new AudioSaver(recordedFile);
+            AudioSaver saver = new AudioSaver(activatedArgs.ActiveFile);
             saver.TrimFromStart = PositionToTimeSpan(LeftPosition);
             saver.TrimFromEnd = PositionToTimeSpan(TotalWaveFormSamples - RightPosition);
             saver.ApplyAutoTune = autoTune;
@@ -197,7 +228,7 @@ namespace VoiceRecorder
         private void RenderFile()
         {
             SampleAggregator.RaiseRestart();
-            using (WaveFileReader reader = new WaveFileReader(recordedFile))
+            using (WaveFileReader reader = new WaveFileReader(this.activatedArgs.ActiveFile))
             {
                 this.samplesPerSecond = reader.WaveFormat.SampleRate;
                 SampleAggregator.NotificationCount = reader.WaveFormat.SampleRate/10;
@@ -222,7 +253,7 @@ namespace VoiceRecorder
                 TotalWaveFormSamples = totalSamples / sampleAggregator.NotificationCount;
                 SelectAll();
             }
-            audioPlayer.LoadFile(recordedFile);
+            audioPlayer.LoadFile(this.activatedArgs.ActiveFile);
         }
 
         private void Play()
