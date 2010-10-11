@@ -12,10 +12,8 @@ namespace VoiceRecorder.Audio
         int detectedNote;
         protected float pitch;	//set == inputPitch when shiftPitch is called
         protected float shiftedPitch;	//set == the target pitch when shiftPitch is called
-        protected bool snapMode;
         int numshifts;	//number of stored detectedPitch, shiftedPitch pairs stored for the viewer (more = slower, less = faster)
         Queue<PitchShift> shifts;
-        HashSet<int> autoPitches;
         int currPitch;
         int attack;
         int numElapsed;
@@ -23,54 +21,21 @@ namespace VoiceRecorder.Audio
         double vibDepth;
         double g_time;
         bool midiPluggedIn;
-        GuiSlider vibRateSlider;
-        GuiSlider vibDepthSlider;
-        GuiSlider attackSlider;
 
-        public PitchShifter(bool snapmode, bool pluggedIn)
+        protected AutoTuneSettings settings;
+
+        public PitchShifter(AutoTuneSettings settings)
         {
-            snapMode = snapmode;
-            midiPluggedIn = pluggedIn;
+            this.settings = settings;
             numshifts = 5000;
             shifts = new Queue<PitchShift>(numshifts);
-            
-            vibRateSlider = new GuiSlider(0.2, 20.0, 4.0);
-            vibDepthSlider = new GuiSlider(0.0, 0.05, 0);
-            attackSlider = new GuiSlider(0.0, 200, 0.0);
-            // attack is (float)attack * 1024.0/441.0
 
-            autoPitches = new HashSet<int>();
-            autoPitches.Add(0);
-            autoPitches.Add(2);
-            autoPitches.Add(4);
-            autoPitches.Add(5);
-            autoPitches.Add(7);
-            autoPitches.Add(9);
-            autoPitches.Add(11);
             currPitch = 0;
             attack = 0;
             numElapsed = 0;
             vibRate = 4.0;
             vibDepth = 0.00;
             g_time = 0.0;
-        }
-
-        public void addPitch(int pitch)
-        {
-            if (0 > pitch || 12 < pitch) { return; }
-            if (autoPitches.Contains(pitch))
-            {
-                autoPitches.Add(pitch);
-            }
-            else
-            {
-                autoPitches.Remove(pitch);
-            }
-        }
-
-        bool containsPitch(int pitch)
-        {
-            return autoPitches.Contains(pitch);
         }
 
         protected float snapFactor(float freq)
@@ -82,7 +47,7 @@ namespace VoiceRecorder.Audio
             for (int i = 1; i < 120; i++)
             {
                 bool endLoop = false;
-                foreach (int note in autoPitches)
+                foreach (int note in this.settings.AutoPitches)
                 {
                     if (i % 12 == note)
                     {
@@ -136,10 +101,9 @@ namespace VoiceRecorder.Audio
             shifts.Enqueue(shift);
 
             //these are going here, because this gets called once per frame
-            vibRate = vibRateSlider.Value;
-            vibDepth = vibDepthSlider.Value;
-            attack = (int)((attackSlider.Value * 441) / 1024.0);
-
+            vibRate = this.settings.VibratoRate;
+            vibDepth = this.settings.VibratoDepth; 
+            attack = (int)((this.settings.AttackTimeMilliseconds * 441) / 1024.0);
         }
 
         void setDetectedNote(float pitch)
@@ -161,16 +125,6 @@ namespace VoiceRecorder.Audio
             return (note % 12) == (detectedNote % 12) && detectedNote >= 0;
         }
 
-        bool isMidiPluggedIn()
-        {
-            return midiPluggedIn;
-        }
-
-        void toggleSnapMode()
-        {
-            snapMode = !snapMode;
-        }
-
         protected float addVibrato(int nFrames)
         {
             g_time += nFrames;
@@ -181,7 +135,7 @@ namespace VoiceRecorder.Audio
 
     class SmbPitchShifter : PitchShifter
     {
-        public SmbPitchShifter(bool snapmode, bool pluggedIn) : base(snapmode, pluggedIn) { }
+        public SmbPitchShifter(AutoTuneSettings settings) : base(settings) { }
 
         void pitchShift(float factor, int nFrames, float[] buff)
         {
@@ -194,7 +148,7 @@ namespace VoiceRecorder.Audio
         {
             pitch = inputPitch;
             float shiftFactor = 1.0f;
-            if (snapMode)
+            if (this.settings.SnapMode)
             {
                 if (inputPitch > 0)
                 {

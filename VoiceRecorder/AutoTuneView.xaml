@@ -15,19 +15,14 @@
             <Slider Margin="5" Value="{Binding Path=Attack, Mode=TwoWay}" Orientation="Horizontal" Minimum="0" Maximum="200" SmallChange="10" LargeChange="25" Width="200"/>
             <Label Margin="5" Content="{Binding AttackMessage}" />
         </StackPanel>
-        <GroupBox Margin="5" Header="Snap Settings:">
-            <StackPanel>
-                <RadioButton IsChecked="{Binding IsAnyNote}" Margin="5">Any note</RadioButton>
-                <RadioButton IsChecked="{Binding IsSpecifiedNotes}" Margin="5">Selected notes:</RadioButton>
-                <ListBox IsEnabled="{Binding IsSpecifiedNotes}" Margin="5" Height="80" ItemsSource="{Binding Notes}">
-                    <ListBox.ItemTemplate>
-                        <DataTemplate>
-                            <CheckBox IsChecked="{Binding Selected}" Content="{Binding DisplayName}" />
-                        </DataTemplate>
-                    </ListBox.ItemTemplate>
-                </ListBox>
-            </StackPanel>
-        </GroupBox>
+        <Label Margin="5,0" Content="Snap Pitches:"/>
+        <ListBox Margin="5" Height="120" ItemsSource="{Binding Pitches}">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <CheckBox IsChecked="{Binding Selected}" Content="{Binding DisplayName}" />
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
         <StackPanel Orientation="Horizontal">
             <Button Margin="5" Width="100" Command="{Binding ApplyCommand}">Apply</Button>
             <Button Margin="5" Width="100" Command="{Binding CancelCommand}">Cancel</Button>

@@ -25,7 +25,7 @@ namespace VoiceRecorder.Audio
 
             this.source = source;
             this.pitchDetector = new AutoCorrelator();
-            this.pitchShifter = new SmbPitchShifter(true, true);
+            this.pitchShifter = new SmbPitchShifter(Settings);
             this.waveBuffer = new WaveBuffer(8192);
         }
 
@@ -55,7 +55,6 @@ namespace VoiceRecorder.Audio
 
             pitchShifter.ShiftPitch(waveBuffer.FloatBuffer, pitch, targetPitch, outBuffer.FloatBuffer, nFrames);
 
-            //data->pitchshifter->shiftPitch(input_buff, pitch, data->pitchsource->pitches, (double*)outputBuffer, nFrames);
             return nFrames * 4;
         }
 
