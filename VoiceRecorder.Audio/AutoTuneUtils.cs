@@ -14,7 +14,11 @@ namespace VoiceRecorder.Audio
                 IWaveProvider stream16 = new WaveIeeeTo16Provider(streamEffect);
                 using (WaveFileWriter converted = new WaveFileWriter(tempFile, stream16.WaveFormat))
                 {
-                    byte[] buffer = new byte[2048 * 4];
+                    // buffer length needs to be a power of 2 for FFT to work nicely
+                    // however, make the buffer too long and pitches aren't detected fast enough
+                    // successful buffer sizes: 8192, 4096, 2048, 1024
+                    // can sound garbled at 1024
+                    byte[] buffer = new byte[1024]; 
                     int bytesRead;
                     do
                     {

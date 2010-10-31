@@ -16,12 +16,11 @@ namespace VoiceRecorder.Audio
         int numshifts;  //number of stored detectedPitch, shiftedPitch pairs stored for the viewer (more = slower, less = faster)
         Queue<PitchShift> shifts;
         int currPitch;
-        int attack;
+        protected int attack;
         int numElapsed;
-        double vibRate;
-        double vibDepth;
+        protected double vibRate;
+        protected double vibDepth;
         double g_time;
-        bool midiPluggedIn;
 
         protected AutoTuneSettings settings;
 
@@ -93,19 +92,12 @@ namespace VoiceRecorder.Audio
             return (float)(destinationFrequency / freq);
         }
 
-        protected void updateShifts()
+        protected void updateShifts(float detected, float shifted)
         {
             if (shifts.Count >= numshifts) shifts.Dequeue();
-            PitchShift shift;
-            shift.detectedPitch = detectedPitch;
-            shift.shiftedPitch = shiftedPitch;
+            PitchShift shift = new PitchShift(detected, shifted);
             Debug.WriteLine(shift);
             shifts.Enqueue(shift);
-
-            //these are going here, because this gets called once per frame
-            vibRate = this.settings.VibratoRate;
-            vibDepth = this.settings.VibratoDepth; 
-            attack = (int)((this.settings.AttackTimeMilliseconds * 441) / 1024.0);
         }
 
         void setDetectedNote(float pitch)
@@ -142,12 +134,15 @@ namespace VoiceRecorder.Audio
         void pitchShift(float factor, int nFrames, float[] buff)
         {
             //before the second nFrames was def_buffer_size, but def_buffer_size == nFrames (I think)
-            int fftFrameSize = 2048; // MRH: was nFrames but this is not a power of 2
+            // MRH: was nFrames but this is not a power of 2
+            // 2048 works, let's try 1024
+            int fftFrameSize = 2048; 
             SmbPitchShift.smbPitchShift(factor, nFrames, fftFrameSize, 32, 44100f, buff, buff);
         }
 
         public void ShiftPitch(float[] inputBuff, float inputPitch, float targetPitch, float[] outputBuff, int nFrames)
         {
+            UpdateSettings();
             detectedPitch = inputPitch;
             float shiftFactor = 1.0f;
             if (this.settings.SnapMode)
@@ -170,7 +165,7 @@ namespace VoiceRecorder.Audio
 
                 for (int i = 0; i < nFrames; i++)
                 {
-                    outputBuff[i] = tempBuff[i]; // MRH: this was accumulating into output buffer?
+                    outputBuff[i] = tempBuff[i]; // MRH: overwrite, don't accumulate
                 }
             }
             else
@@ -207,17 +202,32 @@ namespace VoiceRecorder.Audio
             //addVibrato(outputBuff, nFrames);
 
             shiftedPitch = inputPitch * shiftFactor;
-            updateShifts();
+            updateShifts(detectedPitch, shiftedPitch);
+        }
+
+        private void UpdateSettings()
+        {
+            //these are going here, because this gets called once per frame
+            vibRate = this.settings.VibratoRate;
+            vibDepth = this.settings.VibratoDepth;
+            attack = (int)((this.settings.AttackTimeMilliseconds * 441) / 1024.0);
         }
     }
     
-    struct PitchShift
+    class PitchShift
     {
-        public float detectedPitch;
-        public float shiftedPitch;
+        public PitchShift(float detected, float shifted)
+        {
+            this.DetectedPitch = detected;
+            this.ShiftedPitch = shifted;
+        }
+
+        public float DetectedPitch { get; private set; }
+        public float ShiftedPitch { get; private set; }
+
         public override string ToString()
         {
-            return String.Format("detected {0:f2}Hz, shifted to {0:f2}Hz", detectedPitch, shiftedPitch);
+            return String.Format("detected {0:f2}Hz, shifted to {1:f2}Hz", DetectedPitch, ShiftedPitch);
         }
     }
 }

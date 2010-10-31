@@ -14,7 +14,7 @@ namespace VoiceRecorder.Tests
         {
             Stopwatch timer = new Stopwatch();
             int iterations = 10;
-            long ms = timer.Time(() => ReadFromTestProvider(1024 * 1024), iterations);
+            long ms = timer.Time(() => ReadFromTestProvider(1024 * 1024, 2048), iterations);
             Console.WriteLine("{0} ms", ms);
         }
 
@@ -22,15 +22,15 @@ namespace VoiceRecorder.Tests
         public void ShortTest()
         {
             Stopwatch timer = new Stopwatch();
-            long ms = timer.Time(() => ReadFromTestProvider(16 * 1024));
+            long ms = timer.Time(() => ReadFromTestProvider(16 * 1024, 2048));
             Console.WriteLine("{0} ms", ms);
         }
 
-        private static void ReadFromTestProvider(int bytesToRead)
+        private static void ReadFromTestProvider(int bytesToRead, int bufferSize)
         {
             TestWaveProvider source = new TestWaveProvider(44100, 1);
             AutoTuneWaveProvider autoTune = new AutoTuneWaveProvider(source);
-            byte[] buffer = new byte[1024 * 4];
+            byte[] buffer = new byte[bufferSize];
             int bytesRead = 0;
             while (bytesRead < bytesToRead)
             {

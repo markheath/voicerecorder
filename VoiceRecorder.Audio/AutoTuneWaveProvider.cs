@@ -49,6 +49,9 @@ namespace VoiceRecorder.Audio
             int bytesRead = source.Read(waveBuffer, 0, count);
             //Debug.Assert(bytesRead == count);
 
+            // the last bit sometimes needs to be rounded up:
+            if (bytesRead > 0) bytesRead = count;
+
             //pitchsource->getPitches();
             int nFrames = bytesRead / sizeof(float); // MRH: was count
             float pitch = pitchDetector.DetectPitch(waveBuffer.FloatBuffer, nFrames);
