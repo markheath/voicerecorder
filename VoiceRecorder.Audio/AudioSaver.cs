@@ -54,7 +54,7 @@ namespace VoiceRecorder.Audio
             {
                 string tempFile = WavFileUtils.GetTempWavFileName();
                 tempFiles.Add(tempFile);
-                AutoTuneUtils.ApplyAutoTune(fileToProcess, tempFile);
+                AutoTuneUtils.ApplyAutoTune(fileToProcess, tempFile, AutoTuneSettings);
                 fileToProcess = tempFile;
             }
             if (SaveFileFormat == SaveFileFormat.Mp3)

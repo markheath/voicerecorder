@@ -5,12 +5,12 @@ namespace VoiceRecorder.Audio
 {
     public class AutoTuneUtils
     {
-        public static void ApplyAutoTune(string fileToProcess, string tempFile)
+        public static void ApplyAutoTune(string fileToProcess, string tempFile, AutoTuneSettings autotuneSettings)
         {
             using (WaveFileReader reader = new WaveFileReader(fileToProcess))
             {
                 IWaveProvider stream32 = new Wave16toIeeeProvider(reader);
-                IWaveProvider streamEffect = new AutoTuneWaveProvider(stream32);
+                IWaveProvider streamEffect = new AutoTuneWaveProvider(stream32, autotuneSettings);
                 IWaveProvider stream16 = new WaveIeeeTo16Provider(streamEffect);
                 using (WaveFileWriter converted = new WaveFileWriter(tempFile, stream16.WaveFormat))
                 {
