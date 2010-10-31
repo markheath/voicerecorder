@@ -15,7 +15,7 @@ namespace VoiceRecorder.Audio
         protected float shiftedPitch;   //set == the target pitch when shiftPitch is called
         int numshifts;  //number of stored detectedPitch, shiftedPitch pairs stored for the viewer (more = slower, less = faster)
         Queue<PitchShift> shifts;
-        int currPitch;
+        protected int currPitch;
         protected int attack;
         int numElapsed;
         protected double vibRate;
@@ -92,10 +92,10 @@ namespace VoiceRecorder.Audio
             return (float)(destinationFrequency / freq);
         }
 
-        protected void updateShifts(float detected, float shifted)
+        protected void updateShifts(float detected, float shifted, int targetNote)
         {
             if (shifts.Count >= numshifts) shifts.Dequeue();
-            PitchShift shift = new PitchShift(detected, shifted);
+            PitchShift shift = new PitchShift(detected, shifted, targetNote);
             Debug.WriteLine(shift);
             shifts.Enqueue(shift);
         }
@@ -202,7 +202,7 @@ namespace VoiceRecorder.Audio
             //addVibrato(outputBuff, nFrames);
 
             shiftedPitch = inputPitch * shiftFactor;
-            updateShifts(detectedPitch, shiftedPitch);
+            updateShifts(detectedPitch, shiftedPitch, this.currPitch);
         }
 
         private void UpdateSettings()
@@ -216,18 +216,21 @@ namespace VoiceRecorder.Audio
     
     class PitchShift
     {
-        public PitchShift(float detected, float shifted)
+        public PitchShift(float detected, float shifted, int destNote)
         {
             this.DetectedPitch = detected;
             this.ShiftedPitch = shifted;
+            this.DestinationNote = destNote;
         }
 
         public float DetectedPitch { get; private set; }
         public float ShiftedPitch { get; private set; }
+        public int DestinationNote { get; private set; }
 
         public override string ToString()
         {
-            return String.Format("detected {0:f2}Hz, shifted to {1:f2}Hz", DetectedPitch, ShiftedPitch);
+            return String.Format("detected {0:f2}Hz, shifted to {1:f2}Hz, {2}{3} ", DetectedPitch, ShiftedPitch,
+                (Notes)(DestinationNote % 12),DestinationNote/12);
         }
     }
 }
