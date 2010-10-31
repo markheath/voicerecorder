@@ -107,7 +107,20 @@ namespace VoiceRecorder
 
         private void Apply()
         {
-            voiceRecorderState.AutoTuneSettings.Enabled = true;
+            UpdateAutoTuneSettingsFromGui();
+            if (voiceRecorderState.AutoTuneSettings.Enabled)
+            {
+                string tempPath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString() + ".wav");
+                // TODO: onto a background thread
+                SaveAs(tempPath);
+                this.voiceRecorderState.EffectedFileName = tempPath;
+            }
+            this.ViewManager.MoveTo("SaveView", this.voiceRecorderState);
+        }
+
+        private void UpdateAutoTuneSettingsFromGui()
+        {
+            voiceRecorderState.AutoTuneSettings.Enabled = IsAutoTuneEnabled;
             voiceRecorderState.AutoTuneSettings.SnapMode = IsSnapMode;
             voiceRecorderState.AutoTuneSettings.AttackTimeMilliseconds = this.AttackTime;
             var selectedCount = this.Pitches.Count(p => p.Selected);
@@ -119,12 +132,6 @@ namespace VoiceRecorder
                     voiceRecorderState.AutoTuneSettings.AutoPitches.Add(pitch.Note);
                 }
             }
-
-            string tempPath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString() + ".wav");
-            // TODO: onto a background thread
-            SaveAs(tempPath);
-            this.voiceRecorderState.EffectedFileName = tempPath;
-            this.ViewManager.MoveTo("SaveView", this.voiceRecorderState);
         }
 
         private void SaveAs(string fileName)

@@ -13,9 +13,14 @@ namespace VoiceRecorder.Audio
         private WaveBuffer waveBuffer;
         private AutoTuneSettings autoTuneSettings;
 
-        public AutoTuneWaveProvider(IWaveProvider source)
+        public AutoTuneWaveProvider(IWaveProvider source) :
+            this(source, new AutoTuneSettings())
         {
-            this.autoTuneSettings = new AutoTuneSettings();
+        }
+
+        public AutoTuneWaveProvider(IWaveProvider source, AutoTuneSettings autoTuneSettings)
+        {
+            this.autoTuneSettings = autoTuneSettings;
             if (source.WaveFormat.SampleRate != 44100)
                 throw new ArgumentException("AutoTune only works at 44.1kHz");
             if (source.WaveFormat.Encoding != WaveFormatEncoding.IeeeFloat)

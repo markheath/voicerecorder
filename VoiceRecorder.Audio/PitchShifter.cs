@@ -4,15 +4,16 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Diagnostics;
 
 namespace VoiceRecorder.Audio
 {
     class PitchShifter
     {
         int detectedNote;
-        protected float pitch;	//set == inputPitch when shiftPitch is called
-        protected float shiftedPitch;	//set == the target pitch when shiftPitch is called
-        int numshifts;	//number of stored detectedPitch, shiftedPitch pairs stored for the viewer (more = slower, less = faster)
+        protected float detectedPitch;  //set == inputPitch when shiftPitch is called
+        protected float shiftedPitch;   //set == the target pitch when shiftPitch is called
+        int numshifts;  //number of stored detectedPitch, shiftedPitch pairs stored for the viewer (more = slower, less = faster)
         Queue<PitchShift> shifts;
         int currPitch;
         int attack;
@@ -96,8 +97,9 @@ namespace VoiceRecorder.Audio
         {
             if (shifts.Count >= numshifts) shifts.Dequeue();
             PitchShift shift;
-            shift.detectedPitch = pitch;
+            shift.detectedPitch = detectedPitch;
             shift.shiftedPitch = shiftedPitch;
+            Debug.WriteLine(shift);
             shifts.Enqueue(shift);
 
             //these are going here, because this gets called once per frame
@@ -146,7 +148,7 @@ namespace VoiceRecorder.Audio
 
         public void ShiftPitch(float[] inputBuff, float inputPitch, float targetPitch, float[] outputBuff, int nFrames)
         {
-            pitch = inputPitch;
+            detectedPitch = inputPitch;
             float shiftFactor = 1.0f;
             if (this.settings.SnapMode)
             {
@@ -212,16 +214,10 @@ namespace VoiceRecorder.Audio
     struct PitchShift
     {
         public float detectedPitch;
-        public float shiftedPitch; //eventually this needs to handle multiple pitches . . . (?)
-    }
-
-    class GuiSlider
-    {
-        public GuiSlider(double minVal, double maxVal, double initialVal)
+        public float shiftedPitch;
+        public override string ToString()
         {
-            this.Value = initialVal;
+            return String.Format("detected {0:f2}Hz, shifted to {0:f2}Hz", detectedPitch, shiftedPitch);
         }
-
-        public double Value { get; private set; }
     }
 }
