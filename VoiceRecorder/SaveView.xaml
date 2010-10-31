@@ -12,12 +12,17 @@
                 LeftSelection="{Binding LeftPosition, Mode=TwoWay}"
                 RightSelection="{Binding RightPosition, Mode=TwoWay}"/>
         <StackPanel Orientation="Horizontal">
-            <Button Margin="5" Width="100" Command="{Binding PlayCommand}">Play</Button>
+            <Button Margin="5" Padding="10,0" Command="{Binding PlayCommand}" ToolTip="Play">
+                <Path Fill="DarkGreen"  Data="M 0,0 l 8,8 l -8,8 Z" />
+            </Button>
+            <Button Margin="5" Padding="10,0"  Command="{Binding StopCommand}" ToolTip="Stop">
+                <Path Fill="Blue" Data="M 0,0 h 15 v 15 h -15 Z" />
+            </Button>
             <Button Margin="5" Width="100" Command="{Binding SelectAllCommand}">Select All</Button>
         </StackPanel>
         <StackPanel Orientation="Horizontal">
             <Button Margin="5" Width="100" Command="{Binding SaveCommand}">Save...</Button>
-            <Button Margin="5" Width="100" Command="{Binding AutoTuneCommand}">Autotune</Button>
+            <Button Margin="5" Width="100" Command="{Binding AutoTuneCommand}">AutoTune</Button>
         </StackPanel>
     </StackPanel>
 </UserControl>

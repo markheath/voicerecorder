@@ -21,14 +21,14 @@ namespace VoiceRecorder.Audio
 
         public TimeSpan TrimFromStart { get; set; }
         public TimeSpan TrimFromEnd { get; set; }
-        public AutoTuneSettings AutoTuneSettings { get; private set; }
+        public AutoTuneSettings AutoTuneSettings { get; set; }
         public SaveFileFormat SaveFileFormat { get; set; }
         public string LameExePath { get; set; }
 
         public AudioSaver(string inputFile)
         {
             this.inputFile = inputFile;
-            this.AutoTuneSettings = new AutoTuneSettings();
+            this.AutoTuneSettings = new AutoTuneSettings(); // default settings
         }
 
         public bool IsTrimNeeded
@@ -54,7 +54,7 @@ namespace VoiceRecorder.Audio
             {
                 string tempFile = WavFileUtils.GetTempWavFileName();
                 tempFiles.Add(tempFile);
-                AutoTuneUtils.ApplyAutotune(fileToProcess, tempFile);
+                AutoTuneUtils.ApplyAutoTune(fileToProcess, tempFile);
                 fileToProcess = tempFile;
             }
             if (SaveFileFormat == SaveFileFormat.Mp3)
