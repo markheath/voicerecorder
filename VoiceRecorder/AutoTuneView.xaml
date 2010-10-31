@@ -12,7 +12,7 @@
         <CheckBox IsChecked="{Binding IsSnapMode}" Margin="5">Snap Mode</CheckBox>
         <StackPanel Orientation="Horizontal">
             <Label Margin="5">Attack</Label>
-            <Slider Margin="5" Value="{Binding Path=Attack, Mode=TwoWay}" Orientation="Horizontal" Minimum="0" Maximum="200" SmallChange="10" LargeChange="25" Width="200"/>
+            <Slider Margin="5" Value="{Binding Path=AttackTime, Mode=TwoWay}" Orientation="Horizontal" Minimum="0" Maximum="200" SmallChange="10" LargeChange="25" Width="180"/>
             <Label Margin="5" Content="{Binding AttackMessage}" />
         </StackPanel>
         <Label Margin="5,0" Content="Snap Pitches:"/>
