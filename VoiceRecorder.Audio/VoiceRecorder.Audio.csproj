@@ -79,6 +79,7 @@
     <Compile Include="AutoTuneWaveProvider.cs" />
     <Compile Include="IAudioPlayer.cs" />
     <Compile Include="IAudioRecorder.cs" />
+    <Compile Include="PitchDetector2.cs" />
     <Compile Include="PitchShifter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RecordingState.cs" />

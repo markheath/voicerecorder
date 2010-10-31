@@ -42,4 +42,6 @@ namespace VoiceRecorder.Audio
         }
         private float[] prevBuffer;
     }
+
+
 }
