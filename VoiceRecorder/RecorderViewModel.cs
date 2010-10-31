@@ -32,7 +32,7 @@ namespace VoiceRecorder
 
         void recorder_Stopped(object sender, EventArgs e)
         {
-            this.ViewManager.MoveTo("SaveView", new SaveViewActivatedArgs(waveFileName, null));
+            this.ViewManager.MoveTo("SaveView", new VoiceRecorderState(waveFileName, null));
         }
 
         void recorder_MaximumCalculated(object sender, MaxSampleEventArgs e)

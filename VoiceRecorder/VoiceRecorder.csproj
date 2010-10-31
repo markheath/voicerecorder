@@ -153,6 +153,7 @@
     <Compile Include="SaveView.xaml.cs">
       <DependentUpon>SaveView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="VoiceRecorderState.cs" />
     <Compile Include="SaveViewModel.cs" />
     <Compile Include="WelcomeView.xaml.cs">
       <DependentUpon>WelcomeView.xaml</DependentUpon>

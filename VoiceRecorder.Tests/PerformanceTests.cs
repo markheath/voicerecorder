@@ -37,8 +37,6 @@ namespace VoiceRecorder.Tests
                 bytesRead += autoTune.Read(buffer, 0, buffer.Length);
             }
         }
-
-
     }
 
     // http://stackoverflow.com/questions/232848/wrapping-stopwatch-timing-with-a-delegate-or-lambda

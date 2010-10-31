@@ -25,6 +25,7 @@ namespace VoiceRecorder.Audio
             AttackTimeMilliseconds = 0.0;
         }
 
+        public bool Enabled { get; set; }
         public bool SnapMode { get; set; }
         public double AttackTimeMilliseconds { get; set; }
         public HashSet<Notes> AutoPitches { get; private set; }
