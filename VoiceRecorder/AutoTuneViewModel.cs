@@ -29,7 +29,6 @@ namespace VoiceRecorder
         public ICommand CancelCommand { get; private set; }
 
         private int attackTimeMilliseconds;
-        private bool isSnapMode;
         private bool isAutoTuneEnabled;
         private VoiceRecorderState voiceRecorderState;
 
@@ -50,22 +49,6 @@ namespace VoiceRecorder
         public string AttackMessage
         {
             get { return String.Format("{0}ms", attackTimeMilliseconds); }
-        }
-
-        public bool IsSnapMode
-        {
-            get
-            {
-                return isSnapMode;
-            }
-            set
-            {
-                if (isSnapMode != value)
-                {
-                    isSnapMode = value;
-                    RaisePropertyChangedEvent("IsSnapMode");
-                }
-            }
         }
 
         public bool IsAutoTuneEnabled
@@ -121,7 +104,6 @@ namespace VoiceRecorder
         private void UpdateAutoTuneSettingsFromGui()
         {
             voiceRecorderState.AutoTuneSettings.Enabled = IsAutoTuneEnabled;
-            voiceRecorderState.AutoTuneSettings.SnapMode = IsSnapMode;
             voiceRecorderState.AutoTuneSettings.AttackTimeMilliseconds = this.AttackTime;
             var selectedCount = this.Pitches.Count(p => p.Selected);
             voiceRecorderState.AutoTuneSettings.AutoPitches.Clear();
@@ -146,7 +128,6 @@ namespace VoiceRecorder
         public override void OnViewActivated(object state)
         {
             this.voiceRecorderState = (VoiceRecorderState)state;
-            this.IsSnapMode = this.voiceRecorderState.AutoTuneSettings.SnapMode;
             this.IsAutoTuneEnabled = true; // coming into this view turns on autotune
             this.AttackTime = (int)this.voiceRecorderState.AutoTuneSettings.AttackTimeMilliseconds;
             foreach(var viewModelPitch in this.Pitches)
