@@ -17,8 +17,8 @@ namespace VoiceRecorder.Audio
                     // buffer length needs to be a power of 2 for FFT to work nicely
                     // however, make the buffer too long and pitches aren't detected fast enough
                     // successful buffer sizes: 8192, 4096, 2048, 1024
-                    // can sound garbled at 1024
-                    byte[] buffer = new byte[1024]; 
+                    // (some pitch detection algorithms need at least 2048)
+                    byte[] buffer = new byte[2048]; 
                     int bytesRead;
                     do
                     {

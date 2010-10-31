@@ -192,7 +192,7 @@ namespace VoiceRecorder.Audio
 
                     for (int i = 0; i < nFrames; i++)
                     {
-                        outputBuff[i] += tempBuff[i];
+                        outputBuff[i] = tempBuff[i];
                     }
                     //break;  //this line is a hack, because we are not polyphonic right now
                 }
