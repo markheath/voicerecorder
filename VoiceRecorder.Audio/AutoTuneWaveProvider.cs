@@ -38,6 +38,8 @@ namespace VoiceRecorder.Audio
         {
             get { return this.autoTuneSettings; }
         }
+        private float previousPitch;
+        private int release;
 
         public int Read(byte[] buffer, int offset, int count)
         {
@@ -55,6 +57,18 @@ namespace VoiceRecorder.Audio
             //pitchsource->getPitches();
             int nFrames = bytesRead / sizeof(float); // MRH: was count
             float pitch = pitchDetector.DetectPitch(waveBuffer.FloatBuffer, nFrames);
+            // MRH: an attempt to make it less "warbly" by holding onto the pitch for at least one more buffer
+            if (pitch == 0f && release < 4)
+            {
+                pitch = previousPitch;
+                release++;
+            }
+            else
+            {
+                this.previousPitch = pitch;
+                release = 0;
+            }
+            
 
             int midiNoteNumber = 40;
             float targetPitch = (float)(8.175 * Math.Pow(1.05946309, midiNoteNumber));
