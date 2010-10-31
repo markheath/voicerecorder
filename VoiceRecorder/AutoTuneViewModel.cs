@@ -29,6 +29,9 @@ namespace VoiceRecorder
         public ICommand CancelCommand { get; private set; }
 
         private int attackTimeMilliseconds;
+        private bool isSnapMode;
+        private bool isAutoTuneEnabled;
+        private VoiceRecorderState voiceRecorderState;
 
         public int AttackTime
         {
@@ -49,7 +52,6 @@ namespace VoiceRecorder
             get { return String.Format("{0}ms", attackTimeMilliseconds); }
         }
 
-        private bool isSnapMode;
         public bool IsSnapMode
         {
             get
@@ -65,7 +67,22 @@ namespace VoiceRecorder
                 }
             }
         }
-        private VoiceRecorderState activatedArgs;
+
+        public bool IsAutoTuneEnabled
+        {
+            get
+            {
+                return isAutoTuneEnabled;
+            }
+            set
+            {
+                if (isAutoTuneEnabled != value)
+                {
+                    isAutoTuneEnabled = value;
+                    RaisePropertyChangedEvent("IsAutoTuneEnabled");
+                }
+            }
+        }
 
         public ObservableCollection<NoteViewModel> Pitches { get; private set; }
 
@@ -90,49 +107,64 @@ namespace VoiceRecorder
 
         private void Apply()
         {
+            voiceRecorderState.AutoTuneSettings.Enabled = true;
+            voiceRecorderState.AutoTuneSettings.SnapMode = IsSnapMode;
+            voiceRecorderState.AutoTuneSettings.AttackTimeMilliseconds = this.AttackTime;
+            var selectedCount = this.Pitches.Count(p => p.Selected);
+            voiceRecorderState.AutoTuneSettings.AutoPitches.Clear();
+            foreach (var pitch in this.Pitches)
+            {
+                if (pitch.Selected || selectedCount == 0)
+                {
+                    voiceRecorderState.AutoTuneSettings.AutoPitches.Add(pitch.Note);
+                }
+            }
+
             string tempPath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString() + ".wav");
             // TODO: onto a background thread
             SaveAs(tempPath);
-
-            this.ViewManager.MoveTo("SaveView", new VoiceRecorderState(this.activatedArgs.RecordingFileName, tempPath));
+            this.voiceRecorderState.EffectedFileName = tempPath;
+            this.ViewManager.MoveTo("SaveView", this.voiceRecorderState);
         }
 
         private void SaveAs(string fileName)
         {
-            AudioSaver saver = new AudioSaver(activatedArgs.ActiveFile);
+            AudioSaver saver = new AudioSaver(voiceRecorderState.ActiveFile);
             saver.SaveFileFormat = SaveFileFormat.Wav;
-            saver.AutoTuneSettings.Enabled = true;
-            saver.AutoTuneSettings.SnapMode = IsSnapMode;
-            saver.AutoTuneSettings.AttackTimeMilliseconds = this.AttackTime;
-            saver.AutoTuneSettings.AutoPitches.Clear();
-            foreach(var pitch in this.Pitches)
-            {
-                if (pitch.Selected)
-                {
-                    saver.AutoTuneSettings.AutoPitches.Add(pitch.Note);
-                }
-            }
+            saver.AutoTuneSettings = this.voiceRecorderState.AutoTuneSettings;
+
             saver.SaveAudio(fileName);
         }
 
         public override void OnViewActivated(object state)
         {
-            this.activatedArgs = (VoiceRecorderState)state;
+            this.voiceRecorderState = (VoiceRecorderState)state;
+            this.IsSnapMode = this.voiceRecorderState.AutoTuneSettings.SnapMode;
+            this.IsAutoTuneEnabled = true; // coming into this view turns on autotune
+            this.AttackTime = (int)this.voiceRecorderState.AutoTuneSettings.AttackTimeMilliseconds;
+            foreach(var viewModelPitch in this.Pitches)
+            {
+                viewModelPitch.Selected = false;
+            }
+            foreach(var pitch in voiceRecorderState.AutoTuneSettings.AutoPitches)
+            {
+                this.Pitches.First(p => p.Note == pitch).Selected = true;
+            }
         }
 
         public override void OnViewDeactivated(bool shuttingDown)
         {
             if (shuttingDown)
             {
-                this.activatedArgs.DeleteFiles();
+                this.voiceRecorderState.DeleteFiles();
             }
             base.OnViewDeactivated(shuttingDown);
         }
 
         private void Cancel()
         {
-            // TODO: delete autotune file if necessary
-            this.ViewManager.MoveTo("SaveView", new VoiceRecorderState(this.activatedArgs.RecordingFileName, null));
+            //this.voiceRecorderState.EffectedFileName = null;
+            this.ViewManager.MoveTo("SaveView", voiceRecorderState);
         }
 
         public void Dispose()

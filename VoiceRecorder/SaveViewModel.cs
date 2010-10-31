@@ -31,6 +31,7 @@ namespace VoiceRecorder
             this.SaveCommand = new RelayCommand(() => Save());
             this.SelectAllCommand = new RelayCommand(() => SelectAll());
             this.PlayCommand = new RelayCommand(() => Play());
+            this.StopCommand = new RelayCommand(() => Stop());
             this.AutoTuneCommand = new RelayCommand(() => AutoTune());
         }
 
@@ -42,6 +43,7 @@ namespace VoiceRecorder
         public ICommand SaveCommand { get; private set; }
         public ICommand SelectAllCommand { get; private set;  }
         public ICommand PlayCommand { get; private set; }
+        public ICommand StopCommand { get; private set; }
         public ICommand AutoTuneCommand { get; private set; }
 
         public override void OnViewActivated(object state)
@@ -208,6 +210,11 @@ namespace VoiceRecorder
             audioPlayer.StartPosition = PositionToTimeSpan(LeftPosition);
             audioPlayer.EndPosition = PositionToTimeSpan(RightPosition);
             audioPlayer.Play();
+        }
+
+        private void Stop()
+        {
+            audioPlayer.Stop();
         }
 
         private void SelectAll()

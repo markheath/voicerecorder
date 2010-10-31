@@ -5,7 +5,7 @@ namespace VoiceRecorder.Audio
 {
     public class AutoTuneUtils
     {
-        public static void ApplyAutotune(string fileToProcess, string tempFile)
+        public static void ApplyAutoTune(string fileToProcess, string tempFile)
         {
             using (WaveFileReader reader = new WaveFileReader(fileToProcess))
             {
