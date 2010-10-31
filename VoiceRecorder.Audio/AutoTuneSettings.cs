@@ -14,11 +14,16 @@ namespace VoiceRecorder.Audio
             PluggedIn = true;
             AutoPitches = new HashSet<Notes>();
             AutoPitches.Add(Notes.C);
+            AutoPitches.Add(Notes.CSharp); 
             AutoPitches.Add(Notes.D);
+            AutoPitches.Add(Notes.DSharp);
             AutoPitches.Add(Notes.E);
             AutoPitches.Add(Notes.F);
+            AutoPitches.Add(Notes.FSharp);
             AutoPitches.Add(Notes.G);
+            AutoPitches.Add(Notes.GSharp); 
             AutoPitches.Add(Notes.A);
+            AutoPitches.Add(Notes.ASharp); 
             AutoPitches.Add(Notes.B);
             VibratoDepth = 0.0;
             VibratoRate = 4.0;
