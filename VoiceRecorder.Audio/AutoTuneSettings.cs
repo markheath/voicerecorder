@@ -31,7 +31,7 @@ namespace VoiceRecorder.Audio
         }
 
         public bool Enabled { get; set; }
-        public bool SnapMode { get; set; }
+        public bool SnapMode { get; set; } // snap mode finds a note from the list to snap to, non-snap mode is provided with target pitches from outside
         public double AttackTimeMilliseconds { get; set; }
         public HashSet<Notes> AutoPitches { get; private set; }
         public bool PluggedIn { get; set; } // not currently used
