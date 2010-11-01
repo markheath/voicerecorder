@@ -18,7 +18,7 @@ namespace VoiceRecorder.Audio
                     // however, make the buffer too long and pitches aren't detected fast enough
                     // successful buffer sizes: 8192, 4096, 2048, 1024
                     // (some pitch detection algorithms need at least 2048)
-                    byte[] buffer = new byte[2048]; 
+                    byte[] buffer = new byte[8192]; 
                     int bytesRead;
                     do
                     {

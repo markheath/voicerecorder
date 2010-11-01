@@ -77,6 +77,7 @@
     <Compile Include="AutoTuneSettings.cs" />
     <Compile Include="AutoTuneUtils.cs" />
     <Compile Include="AutoTuneWaveProvider.cs" />
+    <Compile Include="FftPitchDetector.cs" />
     <Compile Include="IAudioPlayer.cs" />
     <Compile Include="IAudioRecorder.cs" />
     <Compile Include="IPitchDetector.cs" />
