@@ -60,7 +60,7 @@ namespace VoiceRecorder.Audio
         /// Routine smbPitchShift(). See top of file for explanation
         /// Purpose: doing pitch shifting while maintaining duration using the Short
         /// Time Fourier Transform.
-        /// Author: (c)1999-2009 Stephan M. Bernsee <smb [AT] dspdimension [DOT] com>
+        /// Author: (c)1999-2009 Stephan M. Bernsee &lt;smb [AT] dspdimension [DOT] com&gt;
         ///</summary>
         public static void smbPitchShift(float pitchShift, int numSampsToProcess, int fftFrameSize, int osamp, float sampleRate, float[] indata, float[] outdata)
         {
