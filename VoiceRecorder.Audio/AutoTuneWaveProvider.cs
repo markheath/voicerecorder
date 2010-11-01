@@ -29,7 +29,7 @@ namespace VoiceRecorder.Audio
                 throw new ArgumentException("AutoTune only works on mono input sources");
 
             this.source = source;
-            this.pitchDetector = new AutoCorrelator();
+            this.pitchDetector = new AutoCorrelator(source.WaveFormat.SampleRate);
             this.pitchShifter = new SmbPitchShifter(Settings);
             this.waveBuffer = new WaveBuffer(8192);
         }
@@ -56,10 +56,9 @@ namespace VoiceRecorder.Audio
             if (bytesRead > 0) bytesRead = count;
 
             //pitchsource->getPitches();
-            int nFrames = bytesRead / sizeof(float); // MRH: was count
-            float pitch = PitchDetection.DetectPitch(waveBuffer.FloatBuffer, nFrames);
+            int frames = bytesRead / sizeof(float); // MRH: was count
+            float pitch = pitchDetector.DetectPitch(waveBuffer.FloatBuffer, frames);
                 
-                //pitchDetector.DetectPitch(waveBuffer.FloatBuffer, nFrames);
             // MRH: an attempt to make it less "warbly" by holding onto the pitch for at least one more buffer
             if (pitch == 0f && release < maxHold)
             {
@@ -77,9 +76,9 @@ namespace VoiceRecorder.Audio
 
             WaveBuffer outBuffer = new WaveBuffer(buffer);
 
-            pitchShifter.ShiftPitch(waveBuffer.FloatBuffer, pitch, targetPitch, outBuffer.FloatBuffer, nFrames);
+            pitchShifter.ShiftPitch(waveBuffer.FloatBuffer, pitch, targetPitch, outBuffer.FloatBuffer, frames);
 
-            return nFrames * 4;
+            return frames * 4;
         }
 
         public WaveFormat WaveFormat
