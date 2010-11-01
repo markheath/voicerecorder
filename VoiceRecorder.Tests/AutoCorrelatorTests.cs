@@ -21,12 +21,25 @@ namespace VoiceRecorder.Tests
         }
 
         [Test]
-        public void TestSineWaveDetection() 
+        public void TestSineWaveDetectionFft() 
         {
-            float[] buffer = new float[1024];
-            for (int midiNoteNumber = 45; midiNoteNumber < 66; midiNoteNumber++)
+            float[] buffer = new float[4096]; // FFT needs at least 4096 to get the granularity
+            IPitchDetector pitchDetector = new FftPitchDetector(sampleRate);
+            TestPitchDetection(buffer, pitchDetector);
+        }
+
+        [Test]
+        public void TestSineWaveDetectionAutocorrelator()
+        {
+            float[] buffer = new float[4096]; // FFT needs at least 4096 to get the granularity
+            IPitchDetector pitchDetector = new AutoCorrelator(sampleRate);
+            TestPitchDetection(buffer, pitchDetector);
+        }
+
+        private void TestPitchDetection(float[] buffer, IPitchDetector pitchDetector)
+        {
+            for (int midiNoteNumber = 45; midiNoteNumber < 63; midiNoteNumber++)
             {
-                IPitchDetector pitchDetector = new AutoCorrelator(sampleRate);
                 float freq = (float)(8.175 * Math.Pow(1.05946309, midiNoteNumber));
                 SetFrequency(buffer, freq);
                 float detectedPitch = pitchDetector.DetectPitch(buffer, buffer.Length);
