@@ -39,7 +39,8 @@ namespace VoiceRecorder.Audio
                 float corr = 0; // this is calculated as the sum of squares
                 for (int i = 0; i < frames; i++)
                 {
-                    float sample = ((i - lag < 0) ? prevBuffer[frames - (lag - i)] : buffer[i - lag]);
+                    int oldIndex = i - lag;
+                    float sample = ((oldIndex < 0) ? prevBuffer[frames + oldIndex] : buffer[oldIndex]);
                     corr += (sample * buffer[i]);
                 }
                 if (corr > maxCorr)
