@@ -136,8 +136,9 @@ namespace VoiceRecorder.Audio
             //before the second nFrames was def_buffer_size, but def_buffer_size == nFrames (I think)
             // MRH: was nFrames but this is not a power of 2
             // 2048 works, let's try 1024
-            int fftFrameSize = 2048; 
-            SmbPitchShift.smbPitchShift(factor, nFrames, fftFrameSize, 32, 44100f, buff, buff);
+            int fftFrameSize = 2048;
+            int osamp = 32; // 32 is best quality
+            SmbPitchShift.smbPitchShift(factor, nFrames, fftFrameSize, osamp, 44100f, buff, buff);
         }
 
         public void ShiftPitch(float[] inputBuff, float inputPitch, float targetPitch, float[] outputBuff, int nFrames)
