@@ -62,7 +62,9 @@ namespace VoiceRecorder.Audio
             int maxBinIndex = 0;
             for (int bin = minBin; bin <= maxBin; bin++)
             {
-                float intensity = fftBuffer[bin * 2] * fftBuffer[bin * 2] + fftBuffer[bin * 2 + 1] * fftBuffer[bin * 2 + 1];
+                float real = fftBuffer[bin * 2];
+                float imaginary = fftBuffer[bin * 2 + 1];
+                float intensity = real * real + imaginary * imaginary;
                 if (intensity > maxIntensity)
                 {
                     maxIntensity = intensity;
