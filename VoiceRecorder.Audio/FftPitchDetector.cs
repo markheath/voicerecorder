@@ -22,17 +22,34 @@ namespace VoiceRecorder.Audio
         }
 
         private float[] fftBuffer;
-        public float DetectPitch(float[] buffer, int frames)
+        private float[] prevBuffer;
+        public float DetectPitch(float[] buffer, int inFrames)
         {
             Func<int, int, float> window = HammingWindow;
+            if (prevBuffer == null)
+            {
+                prevBuffer = new float[inFrames];
+            }
+
+            // double frames since we are combining present and previous buffers
+            int frames = inFrames * 2;
             if (fftBuffer == null)
             {
-                fftBuffer = new float[frames * 2];
+                fftBuffer = new float[frames * 2]; // times 2 because it is complex input
             }
+
             for (int n = 0; n < frames; n++)
             {
-                fftBuffer[n * 2] = buffer[n]; // *window(n, frames);
-                fftBuffer[n * 2 + 1] = 0; // need to clear out as fft modifies buffer
+                if (n < inFrames)
+                {
+                    fftBuffer[n * 2] = prevBuffer[n] * window(n, frames);
+                    fftBuffer[n * 2 + 1] = 0; // need to clear out as fft modifies buffer
+                }
+                else
+                {
+                    fftBuffer[n * 2] = buffer[n-inFrames] * window(n, frames);
+                    fftBuffer[n * 2 + 1] = 0; // need to clear out as fft modifies buffer
+                }
             }
 
             // assuming frames is a power of 2
