@@ -15,16 +15,24 @@ namespace VoiceRecorder.Audio
             this.sampleRate = sampleRate;
         }
 
+        // http://en.wikipedia.org/wiki/Window_function
+        private float HammingWindow(int n, int N) 
+        {
+            return 0.54f - 0.46f * (float)Math.Cos((2 * Math.PI * n) / (N - 1));
+        }
+
         private float[] fftBuffer;
         public float DetectPitch(float[] buffer, int frames)
         {
+            Func<int, int, float> window = HammingWindow;
             if (fftBuffer == null)
             {
                 fftBuffer = new float[frames * 2];
             }
             for (int n = 0; n < frames; n++)
             {
-                fftBuffer[n * 2] = buffer[n];
+                fftBuffer[n * 2] = buffer[n]; // *window(n, frames);
+                fftBuffer[n * 2 + 1] = 0; // need to clear out as fft modifies buffer
             }
 
             // assuming frames is a power of 2

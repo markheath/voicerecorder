@@ -31,7 +31,7 @@ namespace VoiceRecorder.Tests
         [Test]
         public void TestSineWaveDetectionAutocorrelator()
         {
-            float[] buffer = new float[4096]; // FFT needs at least 4096 to get the granularity
+            float[] buffer = new float[4096];
             IPitchDetector pitchDetector = new AutoCorrelator(sampleRate);
             TestPitchDetection(buffer, pitchDetector);
         }
