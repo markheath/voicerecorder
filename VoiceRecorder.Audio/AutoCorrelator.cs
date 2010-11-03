@@ -54,7 +54,6 @@ namespace VoiceRecorder.Audio
                     secLag = lag;
                 }
             }
-            //n.b. seems like Array.Copy may be getting it wrong with a WaveBuffer to a float[]
             for (int n = 0; n < frames; n++)
             { 
                 prevBuffer[n] = buffer[n]; 
