@@ -10,6 +10,9 @@ using System.IO;
 using GalaSoft.MvvmLight.Command;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Messaging;
+using System.Windows;
+using System.Threading;
+using GalaSoft.MvvmLight.Threading;
 
 namespace VoiceRecorder
 {
@@ -35,6 +38,7 @@ namespace VoiceRecorder
         private bool isAutoTuneEnabled;
         private VoiceRecorderState voiceRecorderState;
         public const string ViewName = "AutoTuneView";
+        private bool isEnabled;
 
         public int AttackTime
         {
@@ -50,6 +54,30 @@ namespace VoiceRecorder
             }
         }
 
+        public bool IsEnabled
+        {
+            get
+            {
+                return isEnabled;
+            }
+            set
+            {
+                if (isEnabled != value)
+                {
+                    isEnabled = value;
+                    RaisePropertyChanged("IsEnabled");
+                    RaisePropertyChanged("ProcessingMessageVisibility");
+                }
+            }
+        }
+
+        public Visibility ProcessingMessageVisibility
+        {
+            get
+            {
+                return isEnabled ? Visibility.Collapsed : Visibility.Visible;
+            }
+        }
         public string AttackMessage
         {
             get { return String.Format("{0}ms", attackTimeMilliseconds); }
@@ -99,10 +127,17 @@ namespace VoiceRecorder
             if (voiceRecorderState.AutoTuneSettings.Enabled)
             {
                 string tempPath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString() + ".wav");
-                // TODO: onto a background thread
-                SaveAs(tempPath);
-                this.voiceRecorderState.EffectedFileName = tempPath;
+                IsEnabled = false;
+                ThreadPool.QueueUserWorkItem((state) => SaveAs(tempPath));
             }
+            else
+            {
+                NavigateToSaveView();
+            }
+        }
+
+        private void NavigateToSaveView()
+        {
             Messenger.Default.Send(new NavigateMessage(SaveViewModel.ViewName, this.voiceRecorderState));
         }
 
@@ -123,16 +158,21 @@ namespace VoiceRecorder
 
         private void SaveAs(string fileName)
         {
+
             AudioSaver saver = new AudioSaver(voiceRecorderState.ActiveFile);
             saver.SaveFileFormat = SaveFileFormat.Wav;
             saver.AutoTuneSettings = this.voiceRecorderState.AutoTuneSettings;
 
             saver.SaveAudio(fileName);
+
+            this.voiceRecorderState.EffectedFileName = fileName;
+            DispatcherHelper.CheckBeginInvokeOnUI(() => NavigateToSaveView());
         }
 
         public void Activated(object state)
         {
             this.voiceRecorderState = (VoiceRecorderState)state;
+            this.IsEnabled = true;
             this.IsAutoTuneEnabled = true; // coming into this view turns on autotune
             this.AttackTime = (int)this.voiceRecorderState.AutoTuneSettings.AttackTimeMilliseconds;
             foreach (var viewModelPitch in this.Pitches)
