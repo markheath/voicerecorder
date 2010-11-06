@@ -33,6 +33,7 @@ namespace VoiceRecorder
         {
             this.CurrentView = views[message.TargetView];
             this.currentViewName = message.TargetView;
+            ((IView)this.CurrentView.DataContext).Activated(message.State);
         }
 
         private void SetupView(string viewName, FrameworkElement view, ViewModelBase viewModel)

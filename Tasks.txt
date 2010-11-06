@@ -14,13 +14,11 @@ Whole App:
 In a future version perhaps:
 * Save as WMA
 * Apply compressor effect
-* Rethink ViewManager - transitioning logic should be from outside
 * Add Unity and create services for SaveFileDialog, MessageBox, OpenFileDialog, Settings, StartProcess
 * WaveFile Renderer only creates drawing visuals it needs, uses its own SampleAggregator
 * Volume meter animations down & up
 * ClickOnce deploy
 * Allow tagging of the MP3
-* Try using MVVM Light
 
 * Range selector needs to scroll - perhaps adapt Dan Crevier's code from 
 http://blogs.msdn.com/llobo/archive/2006/09/06/Scrolling-Scrollviewer-on-Mouse-Drag-at-the-boundaries.aspx

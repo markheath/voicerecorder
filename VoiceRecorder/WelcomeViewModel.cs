@@ -12,7 +12,7 @@ using GalaSoft.MvvmLight;
 
 namespace VoiceRecorder
 {
-    class WelcomeViewModel : ViewModelBase
+    class WelcomeViewModel : ViewModelBase, IView
     {
         private ObservableCollection<string> recordingDevices;
         private int selectedRecordingDeviceIndex;
@@ -22,14 +22,19 @@ namespace VoiceRecorder
         public WelcomeViewModel()
         {
             this.recordingDevices = new ObservableCollection<string>();
-            for (int n = 0; n < WaveIn.DeviceCount; n++)
-            {
-                recordingDevices.Add(WaveIn.GetCapabilities(n).ProductName);
-            }
             this.continueCommand = new RelayCommand(() => MoveToRecorder());
         }
 
         public ICommand ContinueCommand { get { return continueCommand; } }
+
+        public void Activated(object state)
+        {
+            this.recordingDevices.Clear();
+            for (int n = 0; n < WaveIn.DeviceCount; n++)
+            {
+                this.recordingDevices.Add(WaveIn.GetCapabilities(n).ProductName);
+            }
+        }
 
         private void MoveToRecorder()
         {
