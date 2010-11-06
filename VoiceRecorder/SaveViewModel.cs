@@ -42,6 +42,7 @@ namespace VoiceRecorder
 
         private void OnAutoTune()
         {
+            audioPlayer.Dispose(); // needed to relinquish the file as it may get deleted
             Messenger.Default.Send(new NavigateMessage("AutoTuneView", this.voiceRecorderState));
         }
 

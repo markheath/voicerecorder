@@ -16,19 +16,6 @@ using GalaSoft.MvvmLight.Threading;
 
 namespace VoiceRecorder
 {
-    public class NoteViewModel
-    {
-        public NoteViewModel(Notes note, string displayName)
-        {
-            this.Note = note;
-            this.DisplayName = displayName;
-        }
-
-        public Notes Note { get; set; }
-        public bool Selected { get; set; }
-        public string DisplayName { get; set; }
-    }
-
     class AutoTuneViewModel : ViewModelBase, IView
     {
         public ICommand ApplyCommand { get; private set; }
@@ -100,24 +87,69 @@ namespace VoiceRecorder
         }
 
         public ObservableCollection<NoteViewModel> Pitches { get; private set; }
+        public IEnumerable<string> Scales { get { return scalesDictionary.Keys; } }
+        private string selectedScale;
+        public string SelectedScale
+        {
+            get { return selectedScale; }
+            set
+            {
+                if (this.selectedScale != value)
+                {
+                    this.selectedScale = value;
+                    SelectNotes();
+                }
+            }
+        }
+        private Dictionary<string, HashSet<Note>> scalesDictionary;
+
+        private void SelectNotes()
+        {
+            var scale = scalesDictionary[selectedScale];
+            foreach (var p in Pitches)
+            {
+                p.Selected = scale.Contains(p.Note);
+            }
+        }
 
         public AutoTuneViewModel()
         {
             this.ApplyCommand = new RelayCommand(() => Apply());
             this.CancelCommand = new RelayCommand(() => Cancel());
+            scalesDictionary = new Dictionary<string, HashSet<Note>>();
+            scalesDictionary.Add("Chromatic", PredefinedScales.Chromatic);
+            scalesDictionary.Add("Key of C / Am", PredefinedScales.MakeMajorScale(Note.C));
+            scalesDictionary.Add("Key of D / Bm", PredefinedScales.MakeMajorScale(Note.D));
+            scalesDictionary.Add("Key of E / C\u266Fm", PredefinedScales.MakeMajorScale(Note.E));
+            scalesDictionary.Add("Key of F / Dm", PredefinedScales.MakeMajorScale(Note.F));
+            scalesDictionary.Add("Key of G / Em", PredefinedScales.MakeMajorScale(Note.G));
+            scalesDictionary.Add("Key of A / F\u266Fm", PredefinedScales.MakeMajorScale(Note.A));
+            scalesDictionary.Add("Key of B\u266D / Gm", PredefinedScales.MakeMajorScale(Note.ASharp));
+            
+            scalesDictionary.Add("Pentatonic C / Am",       PredefinedScales.MakePentatonicScale(Note.C));
+            scalesDictionary.Add("Pentatonic D / Bm",       PredefinedScales.MakePentatonicScale(Note.D));
+            scalesDictionary.Add("Pentatonic E / C\u266Fm", PredefinedScales.MakePentatonicScale(Note.E));
+            scalesDictionary.Add("Pentatonic F / Dm",       PredefinedScales.MakePentatonicScale(Note.F));
+            scalesDictionary.Add("Pentatonic G / Em",       PredefinedScales.MakePentatonicScale(Note.G));
+            scalesDictionary.Add("Pentatonic A / F\u266Fm", PredefinedScales.MakePentatonicScale(Note.A));
+            scalesDictionary.Add("Pentatonic B\u266D / Gm", PredefinedScales.MakePentatonicScale(Note.ASharp));
+            
+            
             this.Pitches = new ObservableCollection<NoteViewModel>();
-            this.Pitches.Add(new NoteViewModel(Notes.C,"C"));
-            this.Pitches.Add(new NoteViewModel(Notes.CSharp,"C#"));
-            this.Pitches.Add(new NoteViewModel(Notes.D,"D"));
-            this.Pitches.Add(new NoteViewModel(Notes.DSharp,"D#"));
-            this.Pitches.Add(new NoteViewModel(Notes.E,"E"));
-            this.Pitches.Add(new NoteViewModel(Notes.F, "F"));
-            this.Pitches.Add(new NoteViewModel(Notes.FSharp, "F#"));
-            this.Pitches.Add(new NoteViewModel(Notes.G,"G"));
-            this.Pitches.Add(new NoteViewModel(Notes.GSharp,"G#"));
-            this.Pitches.Add(new NoteViewModel(Notes.A,"A"));
-            this.Pitches.Add(new NoteViewModel(Notes.ASharp,"A#"));
-            this.Pitches.Add(new NoteViewModel(Notes.B,"B"));
+
+            this.Pitches.Add(new NoteViewModel(Note.C,"C"));
+            this.Pitches.Add(new NoteViewModel(Note.CSharp,"C\u266F"));
+            this.Pitches.Add(new NoteViewModel(Note.D,"D"));
+            this.Pitches.Add(new NoteViewModel(Note.DSharp, "E\u266D"));
+            this.Pitches.Add(new NoteViewModel(Note.E,"E"));
+            this.Pitches.Add(new NoteViewModel(Note.F, "F"));
+            this.Pitches.Add(new NoteViewModel(Note.FSharp, "F\u266F"));
+            this.Pitches.Add(new NoteViewModel(Note.G,"G"));
+            this.Pitches.Add(new NoteViewModel(Note.GSharp, "A\u266D"));
+            this.Pitches.Add(new NoteViewModel(Note.A,"A"));
+            this.Pitches.Add(new NoteViewModel(Note.ASharp,"B\u266D"));
+            this.Pitches.Add(new NoteViewModel(Note.B,"B"));
+            this.SelectedScale = "Chromatic";
             Messenger.Default.Register<ShuttingDownMessage>(this, (message) => OnShuttingDown(message));
         }
 

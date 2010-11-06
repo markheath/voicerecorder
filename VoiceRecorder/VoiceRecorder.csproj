@@ -142,6 +142,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="MainWindowViewModel.cs" />
+    <Compile Include="NoteViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -162,6 +163,7 @@
     <Compile Include="SaveView.xaml.cs">
       <DependentUpon>SaveView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Scales.cs" />
     <Compile Include="ShuttingDownMessage.cs" />
     <Compile Include="VoiceRecorderState.cs" />
     <Compile Include="SaveViewModel.cs" />
