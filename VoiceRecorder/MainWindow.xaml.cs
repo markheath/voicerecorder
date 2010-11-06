@@ -12,6 +12,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using GalaSoft.MvvmLight.Messaging;
+using GalaSoft.MvvmLight.Threading;
 
 namespace VoiceRecorder
 {
@@ -22,6 +23,7 @@ namespace VoiceRecorder
     {
         public MainWindow()
         {
+            DispatcherHelper.Initialize();
             var vm = new MainWindowViewModel();
             this.Closed += (s, e) => vm.Dispose();
             InitializeComponent();

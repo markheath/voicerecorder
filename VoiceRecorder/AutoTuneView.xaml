@@ -6,7 +6,8 @@
              Background="Khaki"
              mc:Ignorable="d" 
              d:DesignHeight="400" d:DesignWidth="300">
-    <StackPanel>
+    <Grid>
+    <StackPanel IsEnabled="{Binding IsEnabled}">
         <Label Margin="5" HorizontalAlignment="Center" FontWeight="Bold" FontSize="20">AutoTune Settings</Label>
         <StackPanel Orientation="Horizontal">
             <CheckBox IsChecked="{Binding IsAutoTuneEnabled}" Margin="5">Enable Autotune</CheckBox>
@@ -34,4 +35,14 @@
             <Button Margin="5" Width="100" Command="{Binding CancelCommand}">Cancel</Button>
         </StackPanel>
     </StackPanel>
+        <Border BorderBrush="Black" BorderThickness="4" 
+                CornerRadius="10" HorizontalAlignment="Center" 
+                VerticalAlignment="Center" Padding="20" Background="Azure" 
+                Visibility="{Binding ProcessingMessageVisibility}">
+            <StackPanel>
+                <TextBlock Text="Processing..." FontSize="20"/>
+                <TextBlock Text="Please Wait" HorizontalAlignment="Center"/>
+            </StackPanel>
+        </Border>
+    </Grid>
 </UserControl>
