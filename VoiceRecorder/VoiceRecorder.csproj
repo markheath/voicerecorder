@@ -134,6 +134,7 @@
       <DependentUpon>AutoTuneView.xaml</DependentUpon>
     </Compile>
     <Compile Include="AutoTuneViewModel.cs" />
+    <Compile Include="IView.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>

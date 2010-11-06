@@ -13,7 +13,7 @@ using GalaSoft.MvvmLight;
 
 namespace VoiceRecorder
 {
-    class RecorderViewModel : ViewModelBase
+    class RecorderViewModel : ViewModelBase, IView
     {
         private RelayCommand beginRecordingCommand;
         private RelayCommand stopCommand;
@@ -32,7 +32,6 @@ namespace VoiceRecorder
             this.stopCommand = new RelayCommand(() => Stop(),
                 () => recorder.RecordingState == RecordingState.Recording);
             recorder.SampleAggregator.MaximumCalculated += new EventHandler<MaxSampleEventArgs>(recorder_MaximumCalculated);
-            Messenger.Default.Register<NavigateMessage>(this, (message) => OnViewChanged(message));
             Messenger.Default.Register<ShuttingDownMessage>(this, (message) => OnShuttingDown(message));
         }
 
@@ -51,12 +50,9 @@ namespace VoiceRecorder
         public ICommand BeginRecordingCommand { get { return beginRecordingCommand; } }
         public ICommand StopCommand { get { return stopCommand; } }
 
-        private void OnViewChanged(NavigateMessage message)
+        public void Activated(object state)
         {
-            if (message.TargetView == RecorderViewModel.ViewName)
-            {
-                BeginMonitoring((int)message.State);
-            }
+            BeginMonitoring((int)state);
         }
 
         private void OnShuttingDown(ShuttingDownMessage message)

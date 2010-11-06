@@ -16,7 +16,7 @@ using GalaSoft.MvvmLight.Messaging;
 
 namespace VoiceRecorder
 {
-    class SaveViewModel : ViewModelBase
+    class SaveViewModel : ViewModelBase, IView
     {
         private VoiceRecorderState voiceRecorderState;
         private SampleAggregator sampleAggregator;
@@ -37,7 +37,6 @@ namespace VoiceRecorder
             this.PlayCommand = new RelayCommand(() => Play());
             this.StopCommand = new RelayCommand(() => Stop());
             this.AutoTuneCommand = new RelayCommand(() => OnAutoTune());
-            Messenger.Default.Register<NavigateMessage>(this, (message) => OnViewChanged(message));
             Messenger.Default.Register<ShuttingDownMessage>(this, (message) => OnShuttingDown(message));
         }
 
@@ -52,13 +51,10 @@ namespace VoiceRecorder
         public ICommand StopCommand { get; private set; }
         public ICommand AutoTuneCommand { get; private set; }
 
-        private void OnViewChanged(NavigateMessage message)
+        public void Activated(object state)
         {
-            if (message.TargetView == SaveViewModel.ViewName)
-            {
-                this.voiceRecorderState = (VoiceRecorderState)message.State;
-                RenderFile();
-            }
+            this.voiceRecorderState = (VoiceRecorderState)state;
+            RenderFile();
         }
 
         private void OnShuttingDown(ShuttingDownMessage message)

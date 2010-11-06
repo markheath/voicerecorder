@@ -26,7 +26,7 @@ namespace VoiceRecorder
         public string DisplayName { get; set; }
     }
 
-    class AutoTuneViewModel : ViewModelBase
+    class AutoTuneViewModel : ViewModelBase, IView
     {
         public ICommand ApplyCommand { get; private set; }
         public ICommand CancelCommand { get; private set; }
@@ -90,7 +90,6 @@ namespace VoiceRecorder
             this.Pitches.Add(new NoteViewModel(Notes.A,"A"));
             this.Pitches.Add(new NoteViewModel(Notes.ASharp,"A#"));
             this.Pitches.Add(new NoteViewModel(Notes.B,"B"));
-            Messenger.Default.Register<NavigateMessage>(this, (message) => OnViewChanged(message));
             Messenger.Default.Register<ShuttingDownMessage>(this, (message) => OnShuttingDown(message));
         }
 
@@ -131,21 +130,18 @@ namespace VoiceRecorder
             saver.SaveAudio(fileName);
         }
 
-        private void OnViewChanged(NavigateMessage message)
+        public void Activated(object state)
         {
-            if (message.TargetView == AutoTuneViewModel.ViewName)
+            this.voiceRecorderState = (VoiceRecorderState)state;
+            this.IsAutoTuneEnabled = true; // coming into this view turns on autotune
+            this.AttackTime = (int)this.voiceRecorderState.AutoTuneSettings.AttackTimeMilliseconds;
+            foreach (var viewModelPitch in this.Pitches)
             {
-                this.voiceRecorderState = (VoiceRecorderState)message.State;
-                this.IsAutoTuneEnabled = true; // coming into this view turns on autotune
-                this.AttackTime = (int)this.voiceRecorderState.AutoTuneSettings.AttackTimeMilliseconds;
-                foreach (var viewModelPitch in this.Pitches)
-                {
-                    viewModelPitch.Selected = false;
-                }
-                foreach (var pitch in voiceRecorderState.AutoTuneSettings.AutoPitches)
-                {
-                    this.Pitches.First(p => p.Note == pitch).Selected = true;
-                }
+                viewModelPitch.Selected = false;
+            }
+            foreach (var pitch in voiceRecorderState.AutoTuneSettings.AutoPitches)
+            {
+                this.Pitches.First(p => p.Note == pitch).Selected = true;
             }
         }
 
