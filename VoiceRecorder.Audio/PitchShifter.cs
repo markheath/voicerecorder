@@ -231,7 +231,7 @@ namespace VoiceRecorder.Audio
         public override string ToString()
         {
             return String.Format("detected {0:f2}Hz, shifted to {1:f2}Hz, {2}{3} ", DetectedPitch, ShiftedPitch,
-                (Notes)(DestinationNote % 12),DestinationNote/12);
+                (Note)(DestinationNote % 12),DestinationNote/12);
         }
     }
 }
