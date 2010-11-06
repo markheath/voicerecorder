@@ -6,32 +6,34 @@ using System.Collections.ObjectModel;
 using NAudio.Wave;
 using System.Windows.Input;
 using VoiceRecorder.Core;
+using GalaSoft.MvvmLight.Command;
+using GalaSoft.MvvmLight.Messaging;
+using GalaSoft.MvvmLight;
 
 namespace VoiceRecorder
 {
     class WelcomeViewModel : ViewModelBase
     {
-        IViewManager viewManager;
-        ObservableCollection<string> recordingDevices;
-        int selectedRecordingDeviceIndex;
-        ICommand continueCommand;        
+        private ObservableCollection<string> recordingDevices;
+        private int selectedRecordingDeviceIndex;
+        private ICommand continueCommand;
+        public const string ViewName = "WelcomeView";
 
-        public WelcomeViewModel(IViewManager viewManager)
+        public WelcomeViewModel()
         {
-            this.viewManager = viewManager;            
             this.recordingDevices = new ObservableCollection<string>();
             for (int n = 0; n < WaveIn.DeviceCount; n++)
             {
                 recordingDevices.Add(WaveIn.GetCapabilities(n).ProductName);
             }
-            this.continueCommand = new RelayCommand(() => MoveToRecorder());            
+            this.continueCommand = new RelayCommand(() => MoveToRecorder());
         }
 
         public ICommand ContinueCommand { get { return continueCommand; } }
 
         private void MoveToRecorder()
         {
-            viewManager.MoveTo("RecorderView", SelectedIndex);
+            Messenger.Default.Send(new NavigateMessage(RecorderViewModel.ViewName, SelectedIndex));
         }
 
         public ObservableCollection<string> RecordingDevices 
@@ -50,7 +52,7 @@ namespace VoiceRecorder
                 if (selectedRecordingDeviceIndex != value)
                 {
                     selectedRecordingDeviceIndex = value;
-                    RaisePropertyChangedEvent("SelectedIndex");
+                    RaisePropertyChanged("SelectedIndex");
                 }
             }
         }

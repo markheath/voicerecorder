@@ -10,6 +10,9 @@ using System.Windows;
 using System.IO;
 using VoiceRecorder.Audio;
 using VoiceRecorder.Properties;
+using GalaSoft.MvvmLight.Command;
+using GalaSoft.MvvmLight;
+using GalaSoft.MvvmLight.Messaging;
 
 namespace VoiceRecorder
 {
@@ -22,6 +25,7 @@ namespace VoiceRecorder
         private int totalWaveFormSamples;
         private IAudioPlayer audioPlayer;
         private int samplesPerSecond;
+        public const string ViewName = "SaveView";
 
         public SaveViewModel(IAudioPlayer audioPlayer)
         {
@@ -32,12 +36,14 @@ namespace VoiceRecorder
             this.SelectAllCommand = new RelayCommand(() => SelectAll());
             this.PlayCommand = new RelayCommand(() => Play());
             this.StopCommand = new RelayCommand(() => Stop());
-            this.AutoTuneCommand = new RelayCommand(() => AutoTune());
+            this.AutoTuneCommand = new RelayCommand(() => OnAutoTune());
+            Messenger.Default.Register<NavigateMessage>(this, (message) => OnViewChanged(message));
+            Messenger.Default.Register<ShuttingDownMessage>(this, (message) => OnShuttingDown(message));
         }
 
-        private void AutoTune()
+        private void OnAutoTune()
         {
-            this.ViewManager.MoveTo("AutoTuneView", this.voiceRecorderState);
+            Messenger.Default.Send(new NavigateMessage("AutoTuneView", this.voiceRecorderState));
         }
 
         public ICommand SaveCommand { get; private set; }
@@ -46,19 +52,22 @@ namespace VoiceRecorder
         public ICommand StopCommand { get; private set; }
         public ICommand AutoTuneCommand { get; private set; }
 
-        public override void OnViewActivated(object state)
+        private void OnViewChanged(NavigateMessage message)
         {
-            this.voiceRecorderState = (VoiceRecorderState)state;
-            RenderFile();
-            base.OnViewActivated(state);
+            if (message.TargetView == SaveViewModel.ViewName)
+            {
+                this.voiceRecorderState = (VoiceRecorderState)message.State;
+                RenderFile();
+            }
         }
 
-        public override void OnViewDeactivated(bool shuttingDown)
+        private void OnShuttingDown(ShuttingDownMessage message)
         {
             audioPlayer.Dispose();
-            if (shuttingDown)
+            
+            if (message.CurrentViewName == SaveViewModel.ViewName)
             {
-                voiceRecorderState.DeleteFiles();
+                this.voiceRecorderState.DeleteFiles();
             }
         }
 
@@ -118,7 +127,7 @@ namespace VoiceRecorder
                 if (leftPosition != value)
                 {
                     leftPosition = value;
-                    RaisePropertyChangedEvent("LeftPosition");
+                    RaisePropertyChanged("LeftPosition");
                 }
             }
         }
@@ -134,7 +143,7 @@ namespace VoiceRecorder
                 if (rightPosition != value)
                 {
                     rightPosition = value;
-                    RaisePropertyChangedEvent("RightPosition");
+                    RaisePropertyChanged("RightPosition");
                 }
             }
         }
@@ -234,7 +243,7 @@ namespace VoiceRecorder
                 if (sampleAggregator != value)
                 {
                     sampleAggregator = value; 
-                    RaisePropertyChangedEvent("SampleAggregator");
+                    RaisePropertyChanged("SampleAggregator");
                 }
             }
         }        
@@ -250,7 +259,7 @@ namespace VoiceRecorder
                 if (totalWaveFormSamples != value)
                 {
                     totalWaveFormSamples = value;
-                    RaisePropertyChangedEvent("TotalWaveFormSamples");
+                    RaisePropertyChanged("TotalWaveFormSamples");
                 }
             }
         }

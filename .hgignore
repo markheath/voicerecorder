@@ -12,3 +12,4 @@ syntax: glob
 [Oo]bj/
 [Rr]elease/
 glob:*.suo
+*.nupkg
