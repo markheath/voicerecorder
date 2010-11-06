@@ -5,59 +5,63 @@ using System.Text;
 using VoiceRecorder.Core;
 using System.Windows;
 using VoiceRecorder.Audio;
+using GalaSoft.MvvmLight;
+using GalaSoft.MvvmLight.Messaging;
 
 namespace VoiceRecorder
 {
-    class MainWindowViewModel : ViewModelBase, IDisposable
+    class MainWindowViewModel : ViewModelBase
     {
-        IViewManager viewManager;
-        Dictionary<string, ViewModelBase> viewModels;
+        Dictionary<string, FrameworkElement> views;
+        private FrameworkElement currentView;
+        private string currentViewName;
 
         public MainWindowViewModel()
         {
-            viewManager = new ViewManager();
-            viewModels = new Dictionary<string, ViewModelBase>();
+            Messenger.Default.Register<NavigateMessage>(this, (message) => OnNavigate(message));
+            views = new Dictionary<string, FrameworkElement>();
             
-            SetupView("WelcomeView", new WelcomeView(), new WelcomeViewModel(viewManager));
-            SetupView("RecorderView", new RecorderView(), new RecorderViewModel(new AudioRecorder()));
-            SetupView("SaveView", new SaveView(), new SaveViewModel(new AudioPlayer()));
-            SetupView("AutoTuneView", new AutoTuneView(), new AutoTuneViewModel());
+            SetupView(WelcomeViewModel.ViewName, new WelcomeView(), new WelcomeViewModel());
+            SetupView(RecorderViewModel.ViewName, new RecorderView(), new RecorderViewModel(new AudioRecorder()));
+            SetupView(SaveViewModel.ViewName, new SaveView(), new SaveViewModel(new AudioPlayer()));
+            SetupView(AutoTuneViewModel.ViewName, new AutoTuneView(), new AutoTuneViewModel());
 
-            viewManager.ViewChanged += viewManager_ViewChanged;
+            Messenger.Default.Send<NavigateMessage>(new NavigateMessage(WelcomeViewModel.ViewName, null));
+        }
+
+        private void OnNavigate(NavigateMessage message) 
+        {
+            this.CurrentView = views[message.TargetView];
+            this.currentViewName = message.TargetView;
         }
 
         private void SetupView(string viewName, FrameworkElement view, ViewModelBase viewModel)
         {
             view.DataContext = viewModel;
-            viewModel.ViewManager = viewManager;
-            viewManager.AddView(viewName, view);
-            viewModels.Add(viewName, viewModel);            
+            views.Add(viewName, view);
         }
 
-        void viewManager_ViewChanged(object sender, ViewChangedEventArgs e)
-        {
-            var oldViewModel = viewModels[e.OldViewName];
-            oldViewModel.OnViewDeactivated(false);
-            RaisePropertyChangedEvent("CurrentView");
-            var viewModel = viewModels[e.NewViewName];
-            viewModel.OnViewActivated(e.State);
-        }
-
-        public object CurrentView
+        public FrameworkElement CurrentView
         {
             get
             {
-                return viewManager.Current;
+                return currentView;
+            }
+            set
+            {
+                if (this.currentView != value)
+                {
+                    currentView = value;
+                    RaisePropertyChanged("CurrentView");
+                }
             }
         }
 
-        /// <summary>
-        /// Allow the current view to clean itself up when we close
-        /// </summary>
-        public void Dispose()
+        protected override void Dispose(bool disposing)
         {
-            var viewModel = viewModels[viewManager.CurrentViewName];
-            viewModel.OnViewDeactivated(true);
+            Messenger.Default.Send(new ShuttingDownMessage(currentViewName));
+            ((IDisposable)CurrentView.DataContext).Dispose();
+            base.Dispose(disposing);
         }
     }
 }

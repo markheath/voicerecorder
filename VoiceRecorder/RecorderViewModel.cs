@@ -7,6 +7,9 @@ using System.Windows.Threading;
 using VoiceRecorder.Core;
 using System.IO;
 using VoiceRecorder.Audio;
+using GalaSoft.MvvmLight.Messaging;
+using GalaSoft.MvvmLight.Command;
+using GalaSoft.MvvmLight;
 
 namespace VoiceRecorder
 {
@@ -17,6 +20,7 @@ namespace VoiceRecorder
         private IAudioRecorder recorder;
         private float lastPeak;
         private string waveFileName;
+        public const string ViewName = "RecorderView";
 
         public RecorderViewModel(IAudioRecorder recorder)
         {
@@ -28,31 +32,39 @@ namespace VoiceRecorder
             this.stopCommand = new RelayCommand(() => Stop(),
                 () => recorder.RecordingState == RecordingState.Recording);
             recorder.SampleAggregator.MaximumCalculated += new EventHandler<MaxSampleEventArgs>(recorder_MaximumCalculated);
+            Messenger.Default.Register<NavigateMessage>(this, (message) => OnViewChanged(message));
+            Messenger.Default.Register<ShuttingDownMessage>(this, (message) => OnShuttingDown(message));
         }
 
         void recorder_Stopped(object sender, EventArgs e)
         {
-            this.ViewManager.MoveTo("SaveView", new VoiceRecorderState(waveFileName, null));
+            Messenger.Default.Send(new NavigateMessage(SaveViewModel.ViewName, new VoiceRecorderState(waveFileName, null)));
         }
 
         void recorder_MaximumCalculated(object sender, MaxSampleEventArgs e)
         {
             lastPeak = Math.Max(e.MaxSample, Math.Abs(e.MinSample));
-            RaisePropertyChangedEvent("CurrentInputLevel");
-            RaisePropertyChangedEvent("RecordedTime");
+            RaisePropertyChanged("CurrentInputLevel");
+            RaisePropertyChanged("RecordedTime");
         }
 
         public ICommand BeginRecordingCommand { get { return beginRecordingCommand; } }
         public ICommand StopCommand { get { return stopCommand; } }
 
-        public override void OnViewActivated(object state)
+        private void OnViewChanged(NavigateMessage message)
         {
-            BeginMonitoring((int)state);
+            if (message.TargetView == RecorderViewModel.ViewName)
+            {
+                BeginMonitoring((int)message.State);
+            }
         }
 
-        public override void OnViewDeactivated(bool shuttingDown)
+        private void OnShuttingDown(ShuttingDownMessage message)
         {
-            recorder.Stop();
+            if (message.CurrentViewName == RecorderViewModel.ViewName)
+            {
+                recorder.Stop();
+            }
         }
 
         public string RecordedTime
@@ -67,15 +79,15 @@ namespace VoiceRecorder
         private void BeginMonitoring(int recordingDevice)
         {
             recorder.BeginMonitoring(recordingDevice);
-            RaisePropertyChangedEvent("MicrophoneLevel");            
+            RaisePropertyChanged("MicrophoneLevel");
         }
 
         private void BeginRecording()
         {
             this.waveFileName = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString() + ".wav");
             recorder.BeginRecording(waveFileName);
-            RaisePropertyChangedEvent("MicrophoneLevel");
-            RaisePropertyChangedEvent("ShowWaveForm");
+            RaisePropertyChanged("MicrophoneLevel");
+            RaisePropertyChanged("ShowWaveForm");
         }
 
         private void Stop()
@@ -101,7 +113,7 @@ namespace VoiceRecorder
         public SampleAggregator SampleAggregator 
         {
             get
-            {                
+            {
                 return recorder.SampleAggregator;
             }
         }

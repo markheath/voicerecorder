@@ -4,9 +4,22 @@ using System.Linq;
 using System.Text;
 using System.IO;
 using VoiceRecorder.Audio;
+using GalaSoft.MvvmLight.Messaging;
 
 namespace VoiceRecorder
 {
+    class NavigateMessage
+    {
+        public string TargetView { get; private set; }
+        public object State { get; private set; }
+
+        public NavigateMessage(string targetView, object state)
+        {
+            this.TargetView = targetView;
+            this.State = state;
+        }
+    }
+
     class VoiceRecorderState
     {
         private string recordingFileName;

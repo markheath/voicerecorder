@@ -7,6 +7,9 @@ using System.Windows.Input;
 using System.Collections.ObjectModel;
 using VoiceRecorder.Audio;
 using System.IO;
+using GalaSoft.MvvmLight.Command;
+using GalaSoft.MvvmLight;
+using GalaSoft.MvvmLight.Messaging;
 
 namespace VoiceRecorder
 {
@@ -23,7 +26,7 @@ namespace VoiceRecorder
         public string DisplayName { get; set; }
     }
 
-    class AutoTuneViewModel : ViewModelBase, IDisposable
+    class AutoTuneViewModel : ViewModelBase
     {
         public ICommand ApplyCommand { get; private set; }
         public ICommand CancelCommand { get; private set; }
@@ -31,6 +34,7 @@ namespace VoiceRecorder
         private int attackTimeMilliseconds;
         private bool isAutoTuneEnabled;
         private VoiceRecorderState voiceRecorderState;
+        public const string ViewName = "AutoTuneView";
 
         public int AttackTime
         {
@@ -40,8 +44,8 @@ namespace VoiceRecorder
                 if (attackTimeMilliseconds != value)
                 {
                     attackTimeMilliseconds = value;
-                    RaisePropertyChangedEvent("AttackTime");
-                    RaisePropertyChangedEvent("AttackMessage");
+                    RaisePropertyChanged("AttackTime");
+                    RaisePropertyChanged("AttackMessage");
                 }
             }
         }
@@ -62,7 +66,7 @@ namespace VoiceRecorder
                 if (isAutoTuneEnabled != value)
                 {
                     isAutoTuneEnabled = value;
-                    RaisePropertyChangedEvent("IsAutoTuneEnabled");
+                    RaisePropertyChanged("IsAutoTuneEnabled");
                 }
             }
         }
@@ -86,6 +90,8 @@ namespace VoiceRecorder
             this.Pitches.Add(new NoteViewModel(Notes.A,"A"));
             this.Pitches.Add(new NoteViewModel(Notes.ASharp,"A#"));
             this.Pitches.Add(new NoteViewModel(Notes.B,"B"));
+            Messenger.Default.Register<NavigateMessage>(this, (message) => OnViewChanged(message));
+            Messenger.Default.Register<ShuttingDownMessage>(this, (message) => OnShuttingDown(message));
         }
 
         private void Apply()
@@ -98,7 +104,7 @@ namespace VoiceRecorder
                 SaveAs(tempPath);
                 this.voiceRecorderState.EffectedFileName = tempPath;
             }
-            this.ViewManager.MoveTo("SaveView", this.voiceRecorderState);
+            Messenger.Default.Send(new NavigateMessage(SaveViewModel.ViewName, this.voiceRecorderState));
         }
 
         private void UpdateAutoTuneSettingsFromGui()
@@ -125,38 +131,35 @@ namespace VoiceRecorder
             saver.SaveAudio(fileName);
         }
 
-        public override void OnViewActivated(object state)
+        private void OnViewChanged(NavigateMessage message)
         {
-            this.voiceRecorderState = (VoiceRecorderState)state;
-            this.IsAutoTuneEnabled = true; // coming into this view turns on autotune
-            this.AttackTime = (int)this.voiceRecorderState.AutoTuneSettings.AttackTimeMilliseconds;
-            foreach(var viewModelPitch in this.Pitches)
+            if (message.TargetView == AutoTuneViewModel.ViewName)
             {
-                viewModelPitch.Selected = false;
-            }
-            foreach(var pitch in voiceRecorderState.AutoTuneSettings.AutoPitches)
-            {
-                this.Pitches.First(p => p.Note == pitch).Selected = true;
+                this.voiceRecorderState = (VoiceRecorderState)message.State;
+                this.IsAutoTuneEnabled = true; // coming into this view turns on autotune
+                this.AttackTime = (int)this.voiceRecorderState.AutoTuneSettings.AttackTimeMilliseconds;
+                foreach (var viewModelPitch in this.Pitches)
+                {
+                    viewModelPitch.Selected = false;
+                }
+                foreach (var pitch in voiceRecorderState.AutoTuneSettings.AutoPitches)
+                {
+                    this.Pitches.First(p => p.Note == pitch).Selected = true;
+                }
             }
         }
 
-        public override void OnViewDeactivated(bool shuttingDown)
+        private void OnShuttingDown(ShuttingDownMessage message)
         {
-            if (shuttingDown)
+            if (message.CurrentViewName == AutoTuneViewModel.ViewName)
             {
                 this.voiceRecorderState.DeleteFiles();
             }
-            base.OnViewDeactivated(shuttingDown);
         }
 
         private void Cancel()
         {
-            //this.voiceRecorderState.EffectedFileName = null;
-            this.ViewManager.MoveTo("SaveView", voiceRecorderState);
-        }
-
-        public void Dispose()
-        {
+            Messenger.Default.Send(new NavigateMessage(SaveViewModel.ViewName, voiceRecorderState));
         }
     }
 }
