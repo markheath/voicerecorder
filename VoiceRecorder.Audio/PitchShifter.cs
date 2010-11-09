@@ -137,7 +137,7 @@ namespace VoiceRecorder.Audio
             // MRH: was nFrames but this is not a power of 2
             // 2048 works, let's try 1024
             int fftFrameSize = 2048;
-            int osamp = 32; // 32 is best quality
+            int osamp = 8; // 32 is best quality
             SmbPitchShift.smbPitchShift(factor, nFrames, fftFrameSize, osamp, 44100f, buff, buff);
         }
 
