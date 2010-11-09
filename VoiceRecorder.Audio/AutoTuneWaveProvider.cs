@@ -9,7 +9,7 @@ namespace VoiceRecorder.Audio
     {
         private IWaveProvider source;
         private SmbPitchShifter pitchShifter;
-        private AutoCorrelator pitchDetector;
+        private IPitchDetector pitchDetector;
         private WaveBuffer waveBuffer;
         private AutoTuneSettings autoTuneSettings;
 
@@ -30,6 +30,8 @@ namespace VoiceRecorder.Audio
 
             this.source = source;
             this.pitchDetector = new AutoCorrelator(source.WaveFormat.SampleRate);
+            // alternative pitch detector:
+            // this.pitchDetector = new FftPitchDetector(source.WaveFormat.SampleRate); 
             this.pitchShifter = new SmbPitchShifter(Settings);
             this.waveBuffer = new WaveBuffer(8192);
         }
