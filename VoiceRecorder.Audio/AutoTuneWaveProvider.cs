@@ -32,7 +32,7 @@ namespace VoiceRecorder.Audio
             this.pitchDetector = new AutoCorrelator(source.WaveFormat.SampleRate);
             // alternative pitch detector:
             // this.pitchDetector = new FftPitchDetector(source.WaveFormat.SampleRate); 
-            this.pitchShifter = new SmbPitchShifter(Settings);
+            this.pitchShifter = new SmbPitchShifter(Settings, source.WaveFormat.SampleRate);
             this.waveBuffer = new WaveBuffer(8192);
         }
 
