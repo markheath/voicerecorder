@@ -21,12 +21,14 @@ namespace VoiceRecorder.Audio
         protected double vibRate;
         protected double vibDepth;
         double g_time;
+        protected float sampleRate;
 
         protected AutoTuneSettings settings;
 
-        public PitchShifter(AutoTuneSettings settings)
+        public PitchShifter(AutoTuneSettings settings, float sampleRate)
         {
             this.settings = settings;
+            this.sampleRate = sampleRate;
             numshifts = 5000;
             shifts = new Queue<PitchShift>(numshifts);
 
@@ -122,24 +124,14 @@ namespace VoiceRecorder.Audio
         protected float addVibrato(int nFrames)
         {
             g_time += nFrames;
-            float d = (float)(Math.Sin(2 * 3.14159265358979 * vibRate * g_time / 44100) * vibDepth);
+            float d = (float)(Math.Sin(2 * 3.14159265358979 * vibRate * g_time / sampleRate) * vibDepth);
             return d;
         }
     }
 
     class SmbPitchShifter : PitchShifter
     {
-        public SmbPitchShifter(AutoTuneSettings settings) : base(settings) { }
-
-        void pitchShift(float factor, int nFrames, float[] buff)
-        {
-            //before the second nFrames was def_buffer_size, but def_buffer_size == nFrames (I think)
-            // MRH: was nFrames but this is not a power of 2
-            // 2048 works, let's try 1024
-            int fftFrameSize = 2048;
-            int osamp = 8; // 32 is best quality
-            SmbPitchShift.smbPitchShift(factor, nFrames, fftFrameSize, osamp, 44100f, buff, buff);
-        }
+        public SmbPitchShifter(AutoTuneSettings settings, float sampleRate) : base(settings, sampleRate) { }
 
         public void ShiftPitch(float[] inputBuff, float inputPitch, float targetPitch, float[] outputBuff, int nFrames)
         {
@@ -153,51 +145,25 @@ namespace VoiceRecorder.Audio
                     shiftFactor = snapFactor(inputPitch);
                     shiftFactor += addVibrato(nFrames);
                 }
-                if (shiftFactor > 2.0) shiftFactor = 2.0f;
-                if (shiftFactor < 0.5) shiftFactor = 0.5f;
-
-                float[] tempBuff = new float[nFrames];
-                for (int i = 0; i < nFrames; i++)
-                {
-                    tempBuff[i] = (float)(inputBuff[i]);
-                }
-
-                pitchShift(shiftFactor, nFrames, tempBuff);
-
-                for (int i = 0; i < nFrames; i++)
-                {
-                    outputBuff[i] = tempBuff[i]; // MRH: overwrite, don't accumulate
-                }
             }
             else
             {
-                //foreach (float midiPitch in pitches)
                 float midiPitch = targetPitch;
+                shiftFactor = 1.0f;
+                if (inputPitch > 0 && midiPitch > 0)
                 {
-                    shiftFactor = 1.0f;
-                    if (inputPitch > 0 && midiPitch > 0)
-                    {
-                        shiftFactor = midiPitch / inputPitch;
-                    }
-
-                    if (shiftFactor > 2.0) shiftFactor = 2.0f;
-                    if (shiftFactor < 0.5) shiftFactor = 0.5f;
-
-                    float[] tempBuff = new float[nFrames];
-                    for (int i = 0; i < nFrames; i++)
-                    {
-                        tempBuff[i] = inputBuff[i];
-                    }
-
-                    pitchShift(shiftFactor, nFrames, tempBuff);
-
-                    for (int i = 0; i < nFrames; i++)
-                    {
-                        outputBuff[i] = tempBuff[i];
-                    }
-                    //break;  //this line is a hack, because we are not polyphonic right now
+                    shiftFactor = midiPitch / inputPitch;
                 }
             }
+
+            if (shiftFactor > 2.0) shiftFactor = 2.0f;
+            if (shiftFactor < 0.5) shiftFactor = 0.5f;
+
+            // fftFrameSize was nFrames but can't guarantee it is a power of 2
+            // 2048 works, let's try 1024
+            int fftFrameSize = 2048;
+            int osamp = 8; // 32 is best quality
+            SmbPitchShift.smbPitchShift(shiftFactor, nFrames, fftFrameSize, osamp, this.sampleRate, inputBuff, outputBuff);
 
             //vibrato
             //addVibrato(outputBuff, nFrames);
