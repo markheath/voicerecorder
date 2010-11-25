@@ -9,9 +9,9 @@ namespace VoiceRecorder.Audio
         {
             using (WaveFileReader reader = new WaveFileReader(fileToProcess))
             {
-                IWaveProvider stream32 = new Wave16toIeeeProvider(reader);
+                IWaveProvider stream32 = new Wave16ToFloatProvider(reader);
                 IWaveProvider streamEffect = new AutoTuneWaveProvider(stream32, autotuneSettings);
-                IWaveProvider stream16 = new WaveIeeeTo16Provider(streamEffect);
+                IWaveProvider stream16 = new WaveFloatTo16Provider(streamEffect);
                 using (WaveFileWriter converted = new WaveFileWriter(tempFile, stream16.WaveFormat))
                 {
                     // buffer length needs to be a power of 2 for FFT to work nicely
