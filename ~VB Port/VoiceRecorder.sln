@@ -1,0 +1,44 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{0B050756-B061-4C3F-B486-4FF69628D2EF}"
+	ProjectSection(SolutionItems) = preProject
+		Performance1.psess = Performance1.psess
+		Tasks.txt = Tasks.txt
+	EndProjectSection
+EndProject
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "VoiceRecorder", "VoiceRecorder\VoiceRecorder.vbproj", "{7EBEED32-BADD-4454-8309-AC8E6647EE51}"
+EndProject
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "VoiceRecorder.Core", "VoiceRecorder.Core\VoiceRecorder.Core.vbproj", "{9144E39B-F8E8-47D1-ADCC-086E2E806778}"
+EndProject
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "VoiceRecorder.Audio", "VoiceRecorder.Audio\VoiceRecorder.Audio.vbproj", "{91EDFCAD-2495-44D2-BD45-7CC389C6D838}"
+EndProject
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "VoiceRecorder.Tests", "VoiceRecorder.Tests\VoiceRecorder.Tests.vbproj", "{8720D71D-A0DE-4E13-8CC9-FC6515872FED}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{7EBEED32-BADD-4454-8309-AC8E6647EE51}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7EBEED32-BADD-4454-8309-AC8E6647EE51}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7EBEED32-BADD-4454-8309-AC8E6647EE51}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7EBEED32-BADD-4454-8309-AC8E6647EE51}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9144E39B-F8E8-47D1-ADCC-086E2E806778}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9144E39B-F8E8-47D1-ADCC-086E2E806778}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9144E39B-F8E8-47D1-ADCC-086E2E806778}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9144E39B-F8E8-47D1-ADCC-086E2E806778}.Release|Any CPU.Build.0 = Release|Any CPU
+		{91EDFCAD-2495-44D2-BD45-7CC389C6D838}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{91EDFCAD-2495-44D2-BD45-7CC389C6D838}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{91EDFCAD-2495-44D2-BD45-7CC389C6D838}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{91EDFCAD-2495-44D2-BD45-7CC389C6D838}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8720D71D-A0DE-4E13-8CC9-FC6515872FED}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8720D71D-A0DE-4E13-8CC9-FC6515872FED}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8720D71D-A0DE-4E13-8CC9-FC6515872FED}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8720D71D-A0DE-4E13-8CC9-FC6515872FED}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

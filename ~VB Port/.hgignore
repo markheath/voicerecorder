@@ -1,0 +1,16 @@
+# Ignore file for Visual Studio 2008
+
+# use glob syntax
+syntax: glob
+
+# Ignore Visual Studio 2008 files
+*.obj
+*.pdb
+*.user
+[Bb]in/
+[Dd]ebug/
+[Oo]bj/
+[Rr]elease/
+publish/
+glob:*.suo
+*.nupkg
