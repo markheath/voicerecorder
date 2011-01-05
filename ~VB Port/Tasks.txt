@@ -1,0 +1,28 @@
+Initial View:
+* Allow selection of sample rate
+Recorder View:
+* Style the microphone level slider
+Save View:
+* Allow playback of selected portion
+* Bing for LAME
+* Better choice of default folder
+Whole App:
+* Include link to codeplex site
+* Nicer font for app title
+* Better colours for WaveForm display
+
+In a future version perhaps:
+* Save as WMA
+* Apply compressor effect
+* Add Unity and create services for SaveFileDialog, MessageBox, OpenFileDialog, Settings, StartProcess
+* WaveFile Renderer only creates drawing visuals it needs, uses its own SampleAggregator
+* Volume meter animations down & up
+* ClickOnce deploy
+* Allow tagging of the MP3
+* go back and re-record
+* go back and re-select recording device
+* load a file instead of recording it
+* autotune: allow text entry of timestamps and allowed notes
+
+* Range selector needs to scroll - perhaps adapt Dan Crevier's code from 
+http://blogs.msdn.com/llobo/archive/2006/09/06/Scrolling-Scrollviewer-on-Mouse-Drag-at-the-boundaries.aspx
