@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using NAudio.Wave;
 
 namespace VoiceRecorder.Audio
@@ -10,16 +7,12 @@ namespace VoiceRecorder.Audio
     {
         private WaveOut waveOut;
         private TrimWaveStream inStream;
-        
-        public AudioPlayer()
-        {
-        }
 
         public void LoadFile(string path)
         {            
             CloseWaveOut();
             CloseInStream();
-            this.inStream = new TrimWaveStream(new WaveFileReader(path));
+            inStream = new TrimWaveStream(new WaveFileReader(path));
         }
 
         public void Play()
@@ -38,13 +31,13 @@ namespace VoiceRecorder.Audio
             {
                 waveOut = new WaveOut();                
                 waveOut.Init(inStream);
-                waveOut.PlaybackStopped += new EventHandler(waveOut_PlaybackStopped);
+                waveOut.PlaybackStopped += OnPlaybackStopped;
             }
         }
 
-        void waveOut_PlaybackStopped(object sender, EventArgs e)
+        void OnPlaybackStopped(object sender, StoppedEventArgs e)
         {
-            this.PlaybackState = PlaybackState.Stopped;
+            PlaybackState = PlaybackState.Stopped;
         }
 
         public void Stop()

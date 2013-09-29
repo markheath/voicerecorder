@@ -1,17 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using NAudio.Wave;
 using NAudio.Mixer;
-using System.IO;
 
 namespace VoiceRecorder.Audio
 {
     public class AudioRecorder : IAudioRecorder
     {
         WaveIn waveIn;
-        SampleAggregator sampleAggregator;
+        readonly SampleAggregator sampleAggregator;
         UnsignedMixerControl volumeControl;
         double desiredVolume = 100;
         RecordingState recordingState;
@@ -47,15 +44,15 @@ namespace VoiceRecorder.Audio
             }
             waveIn = new WaveIn();
             waveIn.DeviceNumber = recordingDevice;
-            waveIn.DataAvailable += waveIn_DataAvailable;
-            waveIn.RecordingStopped += new EventHandler(waveIn_RecordingStopped);
+            waveIn.DataAvailable += OnDataAvailable;
+            waveIn.RecordingStopped += OnRecordingStopped;
             waveIn.WaveFormat = recordingFormat;
             waveIn.StartRecording();
             TryGetVolumeControl();
             recordingState = RecordingState.Monitoring;
         }
 
-        void waveIn_RecordingStopped(object sender, EventArgs e)
+        void OnRecordingStopped(object sender, StoppedEventArgs e)
         {
             recordingState = RecordingState.Stopped;
             writer.Dispose();
@@ -101,24 +98,18 @@ namespace VoiceRecorder.Audio
             else
             {
                 var mixer = new Mixer(waveInDeviceNumber);
-                foreach (var destination in mixer.Destinations)
+                foreach (var destination in mixer.Destinations
+                    .Where(d => d.ComponentType == MixerLineComponentType.DestinationWaveIn))
                 {
-                    if (destination.ComponentType == MixerLineComponentType.DestinationWaveIn)
+                    foreach (var source in destination.Sources
+                        .Where(source => source.ComponentType == MixerLineComponentType.SourceMicrophone))
                     {
-                        foreach (var source in destination.Sources)
+                        foreach (var control in source.Controls
+                            .Where(control => control.ControlType == MixerControlType.Volume))
                         {
-                            if (source.ComponentType == MixerLineComponentType.SourceMicrophone)
-                            {
-                                foreach (var control in source.Controls)
-                                {
-                                    if (control.ControlType == MixerControlType.Volume)
-                                    {
-                                        volumeControl = control as UnsignedMixerControl;
-                                        MicrophoneLevel = desiredVolume;
-                                        break;
-                                    }
-                                }
-                            }
+                            volumeControl = control as UnsignedMixerControl;
+                            MicrophoneLevel = desiredVolume;
+                            break;
                         }
                     }
                 }
@@ -166,14 +157,11 @@ namespace VoiceRecorder.Audio
                 {
                     return TimeSpan.Zero;
                 }
-                else
-                {
-                    return TimeSpan.FromSeconds((double)writer.Length / writer.WaveFormat.AverageBytesPerSecond);
-                }
+                return TimeSpan.FromSeconds((double)writer.Length / writer.WaveFormat.AverageBytesPerSecond);
             }
         }
 
-        void waveIn_DataAvailable(object sender, WaveInEventArgs e)
+        void OnDataAvailable(object sender, WaveInEventArgs e)
         {
             byte[] buffer = e.Buffer;
             int bytesRecorded = e.BytesRecorded;
@@ -195,10 +183,10 @@ namespace VoiceRecorder.Audio
             if (recordingState == RecordingState.Recording
                 || recordingState == RecordingState.RequestedStop)
             {
-                int toWrite = (int)Math.Min(maxFileLength - writer.Length, bytesRecorded);
+                var toWrite = (int)Math.Min(maxFileLength - writer.Length, bytesRecorded);
                 if (toWrite > 0)
                 {
-                    writer.WriteData(buffer, 0, bytesRecorded);
+                    writer.Write(buffer, 0, bytesRecorded);
                 }
                 else
                 {

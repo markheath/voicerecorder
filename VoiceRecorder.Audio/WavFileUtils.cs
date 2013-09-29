@@ -11,9 +11,9 @@ namespace VoiceRecorder.Audio
     {
         public static void TrimWavFile(string inPath, string outPath, TimeSpan cutFromStart, TimeSpan cutFromEnd)
         {
-            using (WaveFileReader reader = new WaveFileReader(inPath))
+            using (var reader = new WaveFileReader(inPath))
             {
-                using (WaveFileWriter writer = new WaveFileWriter(outPath, reader.WaveFormat))
+                using (var writer = new WaveFileWriter(outPath, reader.WaveFormat))
                 {
                     int bytesPerMillisecond = reader.WaveFormat.AverageBytesPerSecond / 1000;
 
@@ -47,7 +47,7 @@ namespace VoiceRecorder.Audio
                     int bytesRead = reader.Read(buffer, 0, bytesToRead);
                     if (bytesRead > 0)
                     {
-                        writer.WriteData(buffer, 0, bytesRead);
+                        writer.Write(buffer, 0, bytesRead);
                     }
                 }
             }
