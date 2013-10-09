@@ -25,24 +25,24 @@ namespace VoiceRecorder.Core
 
         public SampleAggregator SampleAggregator
         {
-            get { return (SampleAggregator)this.GetValue(SampleAggregatorProperty); }
-            set { this.SetValue(SampleAggregatorProperty, value); }
+            get { return (SampleAggregator)GetValue(SampleAggregatorProperty); }
+            set { SetValue(SampleAggregatorProperty, value); }
         }
         
         private static void OnSampleAggregatorChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
-            PolygonWaveFormControl control = (PolygonWaveFormControl)sender;
+            var control = (PolygonWaveFormControl)sender;
             control.Subscribe();
         }
 
         public void Subscribe()
         {
-            SampleAggregator.MaximumCalculated += SampleAggregator_MaximumCalculated;
+            SampleAggregator.MaximumCalculated += OnMaximumCalculated;
         }
 
-        void SampleAggregator_MaximumCalculated(object sender, MaxSampleEventArgs e)
+        void OnMaximumCalculated(object sender, MaxSampleEventArgs e)
         {
-            if (this.IsEnabled)
+            if (IsEnabled)
             {
                 this.AddValue(e.MaxSample, e.MinSample);
             }
@@ -54,13 +54,13 @@ namespace VoiceRecorder.Core
         private double xScale = 2;
         private int blankZone = 10;
 
-        Polygon waveForm = new Polygon();
+        readonly Polygon waveForm = new Polygon();
 
         public PolygonWaveFormControl()
         {
-            this.SizeChanged += OnSizeChanged;
+            SizeChanged += OnSizeChanged;
             InitializeComponent();
-            waveForm.Stroke = this.Foreground;
+            waveForm.Stroke = Foreground;
             waveForm.StrokeThickness = 1;
             waveForm.Fill = new SolidColorBrush(Colors.Bisque);
             mainCanvas.Children.Add(waveForm);            
@@ -72,8 +72,8 @@ namespace VoiceRecorder.Core
             renderPosition = 0;
             ClearAllPoints();
 
-            this.yTranslate = this.ActualHeight / 2;
-            this.yScale = this.ActualHeight / 2;
+            yTranslate = ActualHeight / 2;
+            yScale = ActualHeight / 2;
         }
 
         private void ClearAllPoints()
@@ -88,7 +88,7 @@ namespace VoiceRecorder.Core
 
         public void AddValue(float maxValue, float minValue)
         {
-            int visiblePixels = (int)(ActualWidth / xScale);
+            var visiblePixels = (int)(ActualWidth / xScale);
             if (visiblePixels > 0)
             {
                 CreatePoint(maxValue, minValue);
@@ -119,9 +119,9 @@ namespace VoiceRecorder.Core
 
         private void CreatePoint(float topValue, float bottomValue)
         {
-            double topYPos = SampleToYPosition(topValue);
-            double bottomYPos = SampleToYPosition(bottomValue);
-            double xPos = renderPosition * xScale;
+            var topYPos = SampleToYPosition(topValue);
+            var bottomYPos = SampleToYPosition(bottomValue);
+            var xPos = renderPosition * xScale;
             if (renderPosition >= Points)
             {
                 int insertPos = Points;

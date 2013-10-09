@@ -32,7 +32,8 @@
     <StackPanel Background="Khaki">
         <Label Margin="5" HorizontalAlignment="Center" FontWeight="Bold" FontSize="20">.NET Voice Recorder</Label>
         <Label Margin="5">Check the levels before starting recording:</Label>
-        <ProgressBar Margin="5" Orientation="Horizontal" Value="{Binding CurrentInputLevel, Mode=OneWay}" Height="20" />
+        <ProgressBar Margin="5" Orientation="Horizontal" 
+                     Value="{Binding CurrentInputLevel, Mode=OneWay}" Height="20" />
         <Label Margin="5">Microphone Level:</Label>
         <Slider Margin="5" Orientation="Horizontal" Value="{Binding MicrophoneLevel, Mode=TwoWay}" Maximum="100" />
         <StackPanel Orientation="Horizontal">

@@ -1,24 +1,16 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Diagnostics;
 
 namespace VoiceRecorder.Audio
 {
     public class SampleAggregator
     {
-        // volume
         public event EventHandler<MaxSampleEventArgs> MaximumCalculated;
         public event EventHandler Restart = delegate { };
-        public float maxValue;
-        public float minValue;
+        private float maxValue;
+        private float minValue;
         public int NotificationCount { get; set; }
         int count;
-
-        public SampleAggregator()
-        {
-        }
 
         public void RaiseRestart()
         {
@@ -52,8 +44,8 @@ namespace VoiceRecorder.Audio
         [DebuggerStepThrough]
         public MaxSampleEventArgs(float minValue, float maxValue)
         {
-            this.MaxSample = maxValue;
-            this.MinSample = minValue;
+            MaxSample = maxValue;
+            MinSample = minValue;
         }
         public float MaxSample { get; private set; }
         public float MinSample { get; private set; }
